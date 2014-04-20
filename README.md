@@ -50,3 +50,18 @@ Copiar el fichero megarender.sh en "//" y, desde un terminal, en //, ejecutar:
 
     sh megarender.sh
 
+stop_motion / elphel_panel
+------------------------
+
+hay que instalar varios programas para usar este addon...
+
+para la webcam hay que instalar:
+
+    gstreamer-0.10
+    guvcview
+    mencoder
+
+para la elphel tambien hace falta
+
+    exiftools
+
