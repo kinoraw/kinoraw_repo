@@ -33,5 +33,20 @@ http://wiki.blender.org/index.php/Extensions:2.6/Py/Scripts/Sequencer/Eco
 
 para que funcione exif info panel hay que instalar exiftools:
 
-sudo apt-get install libimage-exiftool-perl
+    sudo apt-get install libimage-exiftool-perl
+
+multi_thread_vse.py + megarender.sh
+-------------------------------
+
+Esto no es un addon, sino un script que hay que correr desde el editor de textos de blender. 
+
+El script divide el timeline en n trozos, siendo n el numero de nucleos disponibles, y genera varios scripts para lanzar tantos blenders como nucleos, desde un terminal.
+
+Editar la linea 11 con el numero de nucleos a usar, y la linea 14 con la ruta al ejecutable blender.
+
+Tras ejecutar el script se crea una carpeta con los scripts de cada trozos, por defecto en la carpeta //scripts_render
+
+Copiar el fichero megarender.sh en "//" y, desde un terminal, en //, ejecutar:
+
+    sh megarender.sh
 
