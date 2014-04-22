@@ -46,7 +46,7 @@ for i, j in enumerate(tramos):
     command = "{} {} -b -S {} -s {} -e {} -a".format(blender, file, sce.name, j[0], j[1])
     text_file = open(bpy.path.abspath("{}/render_part_{}.sh".format(folder,str(i))), "w")
     text_file.write(command)
-    command = """zenity --info --text='render {} finished. from frame {} to {}'""".format(i, j[0],j[1])
+    command = """test $_ && zenity --info --text='render {} finished. from frame {} to {}' || zenity --info --text='Errors in script {}'""".format(i, j[0],j[1], i)
     text_file.write("\n")
     text_file.write(command)
     text_file.close()
