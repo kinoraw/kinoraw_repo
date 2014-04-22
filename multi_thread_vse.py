@@ -11,7 +11,7 @@ e_frame = sce.frame_end
 nucleos = 8
 
 # path to blender executable
-blender = "/home/carlos/apps/blender-2.69-linux-glibc211-x86_64/blender"
+blender = "~/soft/blender-2.70a-linux-glibc211-x86_64/blender"
 #blender = "c:/Users/carlos/soft/blender-2.69-testbuild1-windows64/blender.exe"
 
 # current filename
@@ -19,9 +19,7 @@ file = bpy.data.filepath
 
 # output folder for the scripts
 folder = bpy.path.abspath("//scripts_render")
-
 os.system("mkdir "+folder)
-
 duration = e_frame - s_frame
 
 part = int(duration / nucleos)
@@ -42,10 +40,24 @@ for i in range(nucleos):
     tramos.append(tramo)
 print(tramos)
 
+#generate one script for each part
+
 for i, j in enumerate(tramos):
     command = "{} {} -b -S {} -s {} -e {} -a".format(blender, file, sce.name, j[0], j[1])
-    #print(command)
     text_file = open(bpy.path.abspath("{}/render_part_{}.sh".format(folder,str(i))), "w")
     text_file.write(command)
+    command = """zenity --info --text='render {} finished. from frame {} to {}'""".format(i, j[0],j[1])
+    text_file.write("\n")
+    text_file.write(command)
     text_file.close()
+    
+# generate main script
 
+text_file = open(bpy.path.abspath("//megarender.sh".format(folder,str(i))), "w")
+for i, j in enumerate(tramos):
+    command = """gnome-terminal -e 'sh scripts_render/render_part_{}.sh'""".format(i)
+    text_file.write(command)
+    if i < len(tramos)-1:
+        print(i, len(tramos)-1)
+        text_file.write(" && ")
+text_file.close()
