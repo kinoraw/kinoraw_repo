@@ -595,7 +595,7 @@ class CameraGetImageOperator(bpy.types.Operator):
 
 class StopMotionPanel(bpy.types.Panel):
     bl_label = "Stop Motion Tools"
-    bl_idname = "OBJECT_PT_elphel"
+    bl_idname = "OBJECT_PT_stopmotion"
     bl_space_type = 'SEQUENCE_EDITOR'
     bl_region_type = 'UI'
 
