@@ -50,6 +50,9 @@ desde un terminal, en //, ejecutar:
 
     sh megarender.sh
 
+En la version multi_thread_vse_solo.py, se utiliza un solo script y mejora la compatibilidad con otras distros de linux, pero aun no indica los frames fallidos en caso de error.
+
+
 stop_motion / elphel_panel
 ------------------------
 
