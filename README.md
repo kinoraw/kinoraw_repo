@@ -35,22 +35,10 @@ para que funcione exif info panel hay que instalar exiftools:
 
     sudo apt-get install libimage-exiftool-perl
 
-multi_thread_vse.py
+mega_render_operator.py
 -------------------------------
 
-Esto no es un addon, sino un script que hay que correr desde el editor de textos de blender. 
-
-El script divide el timeline en n trozos, siendo n el numero de nucleos disponibles, y genera varios scripts para lanzar tantos blenders como nucleos, desde un terminal.
-
-Editar la linea 11 con el numero de nucleos a usar, y la linea 14 con la ruta al ejecutable blender.
-
-Tras ejecutar el script se crea una carpeta con los scripts de cada trozos, por defecto en la carpeta //scripts_render y un script megarender.sh en la carpeta //
-
-desde un terminal, en //, ejecutar:
-
-    sh megarender.sh
-
-En la version multi_thread_vse_solo.py, se utiliza un solo script y mejora la compatibilidad con otras distros de linux, pero aun no indica los frames fallidos en caso de error. Funciona igual pero sin crear carpetas.
+El operador "generate" divide el timeline en n trozos, siendo n el numero de nucleos disponibles, y genera un script en bash para lanzar tantos blenders como nucleos se le indiquen, ejecutando procesos de blender en background.
 
 
 stop_motion / elphel_panel
