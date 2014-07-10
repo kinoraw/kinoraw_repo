@@ -23,10 +23,12 @@ bl_info = {
     "blender": (2, 70, 0),
     "category": "Sequencer",
     "location": "Sequencer",
-    "description": "some",
-    "wiki_url": "not yet",
-    "tracker_url": "not yet",
-    "support": ""}
+    "description": "mega render operator",
+    "warning": "",
+    "wiki_url": "http://kinoraw.net",
+    "tracker_url": "http://kinoraw.net",
+    "support": "COMMUNITY"}
+
 
 
 import bpy, os
@@ -80,7 +82,7 @@ class GenerateMegaRenderOperator(bpy.types.Operator):
     def execute(self, context):
         
         preferences = context.user_preferences
-        prefs = preferences.addons['mega_render_operator'].preferences
+        prefs = preferences.addons['megarenderoperator'].preferences
 
         blenderpath = prefs.blenderpath
         scriptfilename = bpy.path.abspath(prefs.scriptfilename)
@@ -129,12 +131,12 @@ class LaunchMegaRenderOperator(bpy.types.Operator):
     @classmethod
     def poll(self, context):
         preferences = context.user_preferences
-        prefs = preferences.addons['mega_render_operator'].preferences
+        prefs = preferences.addons['megarenderoperator'].preferences
         return os.path.isfile(bpy.path.abspath(prefs.scriptfilename))
 
     def execute(self, context):
         preferences = context.user_preferences
-        prefs = preferences.addons['mega_render_operator'].preferences
+        prefs = preferences.addons['megarenderoperator'].preferences
         scriptfilename = bpy.path.abspath(prefs.scriptfilename)
         command = "sh "+scriptfilename
         print("ejecutando {}".format(scriptfilename))
@@ -157,7 +159,7 @@ class MegaRenderPanel(bpy.types.Panel):
     def draw(self, context):
 
         preferences = context.user_preferences
-        prefs = preferences.addons['mega_render_operator'].preferences
+        prefs = preferences.addons['megarenderoperator'].preferences
         number_of_threads = prefs.number_of_threads
 
         layout = self.layout
@@ -171,7 +173,7 @@ class MegaRenderPanel(bpy.types.Panel):
 
 
 class MegaRenderAddon(bpy.types.AddonPreferences):
-    bl_idname = "mega_render_operator"
+    bl_idname = "megarenderoperator"
     bl_option = {'REGISTER'}
 
     blenderpath = StringProperty(
