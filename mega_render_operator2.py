@@ -82,7 +82,7 @@ class GenerateMegaRenderOperator(bpy.types.Operator):
     def execute(self, context):
         
         preferences = context.user_preferences
-        prefs = preferences.addons['megarenderoperator2'].preferences
+        prefs = preferences.addons['mega_render_operator2'].preferences
 
         blenderpath = prefs.blenderpath
         scriptfilename = bpy.path.abspath(prefs.scriptfilename)
@@ -138,12 +138,12 @@ class LaunchMegaRenderOperator(bpy.types.Operator):
     @classmethod
     def poll(self, context):
         preferences = context.user_preferences
-        prefs = preferences.addons['megarenderoperator2'].preferences
+        prefs = preferences.addons['mega_render_operator2'].preferences
         return os.path.isfile(bpy.path.abspath(prefs.scriptfilename))
 
     def execute(self, context):
         preferences = context.user_preferences
-        prefs = preferences.addons['megarenderoperator2'].preferences
+        prefs = preferences.addons['mega_render_operator2'].preferences
         scriptfilename = bpy.path.abspath(prefs.scriptfilename)
         command = "sh "+scriptfilename
         print("ejecutando {}".format(scriptfilename))
@@ -166,7 +166,7 @@ class MegaRenderPanel(bpy.types.Panel):
     def draw(self, context):
 
         preferences = context.user_preferences
-        prefs = preferences.addons['megarenderoperator2'].preferences
+        prefs = preferences.addons['mega_render_operator2'].preferences
         number_of_threads = prefs.number_of_threads
 
         layout = self.layout
@@ -180,13 +180,13 @@ class MegaRenderPanel(bpy.types.Panel):
 
 
 class MegaRenderAddon(bpy.types.AddonPreferences):
-    bl_idname = "megarenderoperator2"
+    bl_idname = "mega_render_operator2"
     bl_option = {'REGISTER'}
 
     blenderpath = StringProperty(
         name="blender executable path",
         description="blender executable path",
-        default="~/soft/blender-2.70a-linux-glibc211-x86_64/blender")
+        default="~/blender/blender-2.71-linux-glibc211-x86_64/blender")
 
     scriptfilename = StringProperty(
         name="script filename",
