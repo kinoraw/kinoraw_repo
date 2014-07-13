@@ -202,7 +202,7 @@ class MegaRenderAddon(bpy.types.AddonPreferences):
     def draw(self, context):   
         layout = self.layout
         layout.prop(self, "blenderpath")
-        layout.prop(self, "scriptspath")
+        layout.prop(self, "scriptfilename")
         layout.prop(self, "number_of_threads")
             
 
