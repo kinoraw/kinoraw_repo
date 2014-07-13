@@ -109,7 +109,7 @@ class GenerateMegaRenderOperator(bpy.types.Operator):
         text_file.write("#!/bin/bash\necho \"$(date +'%a %d %b %Y - %H:%M:%S'):\" > {}".format(log_file))
         for i, j in enumerate(tramos):
             text_file.write(("\n(\necho '#Rendering part {}'\nSTART_RENDER=$(date +'%s')\n").format(i))
-            text_file.write("RESULT=$({} {} -b -S {} -s {} -e {} -a 2>&1".format(blenderpath, scriptfilename, sce.name, j[0], j[1]))
+            text_file.write("RESULT=$({} {} -b -S {} -s {} -e {} -a 2>&1".format(blenderpath, blendfile, sce.name, j[0], j[1]))
             text_file.write(" | grep 'Saved\|Append\|not an anim\|unknown fileformat') \nEND_RENDER=$(date +'%s')\nRENDERING_SECS=$(($END_RENDER-$START_RENDER))\nLINEAS=$(echo \"$RESULT\" | wc -l)\n")
             text_file.write("if [ $LINEAS -eq {} ];then\n".format(j[1]-j[0]+1))
             text_file.write("   echo \"#Finished frame {} to {} in $(printf '%dh:%dm:%ds' $(($RENDERING_SECS/3600)) $(($RENDERING_SECS%3600/60)) $(($RENDERING_SECS%60)))\"\nelse\n".format(j[0],j[1])) 
