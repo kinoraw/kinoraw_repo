@@ -283,8 +283,11 @@ class CreateAudioToolPanel(bpy.types.Panel):
     def poll(self, context):
         strip = functions.act_strip(context)
         scn = context.scene
+        preferences = bpy.context.user_preferences
+        prefs = preferences.addons['sequencer_extra_actions'].preferences
         if scn and scn.sequence_editor and scn.sequence_editor.active_strip:
-            return strip.type in ('MOVIE')
+            if prefs.use_audio_tools:
+                return strip.type in ('MOVIE')
         else:
             return False
 

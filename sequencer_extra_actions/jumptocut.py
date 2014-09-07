@@ -107,7 +107,7 @@ class OBJECT_OT_Jumpnext(bpy.types.Operator):  #Operator jump next edit point
             self.report({'INFO'},'Last Frame')
         return {'FINISHED'}
 
-
+"""
 # MARKER
 class OBJECT_OT_Markerprev(bpy.types.Operator):
     bl_label = "Marker previous"
@@ -134,6 +134,7 @@ class OBJECT_OT_Markernext(bpy.types.Operator):
         for i in markers: markerlist.append(i.frame)
         bpy.context.scene.frame_current = functions.searchnext(scene.frame_current, markerlist)
         return {'FINISHED'}
+"""
 
 # SOURCE IN OUT
 
@@ -296,8 +297,11 @@ class Jumptocut(bpy.types.Panel):
     def poll(self, context):
         strip = functions.act_strip(context)
         scn = context.scene
+        preferences = bpy.context.user_preferences
+        prefs = preferences.addons['sequencer_extra_actions'].preferences
         if scn and scn.sequence_editor:
-            return True
+            if prefs.use_jumptocut:
+                return True
         else:
             return False
 
@@ -319,8 +323,8 @@ class Jumptocut(bpy.types.Panel):
         #split=row.split()
         colL = split.column()
         colR = split.column()
-        colL.operator("sequencerextra.markprev", icon="MARKER_HLT", text="")
-        colR.operator("sequencerextra.marknext", icon='MARKER_HLT', text="")
+        colL.operator("screen.marker_jump", icon="MARKER_HLT", text="").next=False
+        colR.operator("screen.marker_jump", icon='MARKER_HLT', text="").next=True
 
         row=layout.row()
         split=row.split(percentage=0.33)

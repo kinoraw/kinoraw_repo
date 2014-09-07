@@ -62,7 +62,15 @@ class ProxyAddon(bpy.types.AddonPreferences):
     bl_idname = "sequencer_extra_actions"
     bl_option = {'REGISTER'}
 
+    use_jumptocut = BoolProperty(
+    name='enable jumptocut panel',
+    default=False)
+
     # Proxy Tools
+
+    use_proxy_tools = BoolProperty(
+    name='enable proxy tools panel',
+    default=False)
 
     proxy_dir = StringProperty(
     name='directory to store proxies',
@@ -77,6 +85,10 @@ class ProxyAddon(bpy.types.AddonPreferences):
     default=False)
 
     # Audio Tools
+
+    use_audio_tools = BoolProperty(
+    name='enable audio tools panel',
+    default=False)
     
     audio_dir = StringProperty(
     name='path to store extracted audio',
@@ -102,6 +114,10 @@ class ProxyAddon(bpy.types.AddonPreferences):
 
     # eco
 
+    use_eco_tools = BoolProperty(
+    name='enable eco tools panel',
+    default=False)
+
     eco_value = IntProperty(
         name = 'number of echoes',
         default = 5,
@@ -117,6 +133,10 @@ class ProxyAddon(bpy.types.AddonPreferences):
         default = False)
 
     # random editor
+
+    use_random_editor = BoolProperty(
+    name='enable random editor panel',
+    default=False)
 
     random_frames = IntProperty(
             name='frames',
@@ -138,71 +158,52 @@ class ProxyAddon(bpy.types.AddonPreferences):
 
     def draw(self, context):
 
+        layout = self.layout
+        layout.prop(self, "use_eco_tools")
+
+        layout = self.layout
+        layout.prop(self, "use_random_editor")
+
+        layout = self.layout
+        layout.prop(self, "use_jumptocut")
+
         # PROXY
-
         layout = self.layout
-        layout.label("---------- Proxy Tools default parameters")
+        layout.prop(self, "use_proxy_tools")
+        if self.use_proxy_tools:
 
-        layout = self.layout
-        layout.prop(self, "proxy_dir")
-
-        layout = self.layout
-        layout.prop(self, "proxy_scripts")
-
-        if self.proxy_scripts:
             layout = self.layout
-            layout.prop(self, "proxy_scripts_path")
+            layout.prop(self, "proxy_dir")
+
+            layout = self.layout
+            layout.prop(self, "proxy_scripts")
+
+            if self.proxy_scripts:
+                layout = self.layout
+                layout.prop(self, "proxy_scripts_path")
 
         # AUDIO
-
         layout = self.layout
-        layout.label("---------- Audio Tools default parameters")
-        
-        layout = self.layout
-        layout.prop(self, "audio_dir", text="path for audio files")
-
-
-        if self.audio_scripts:
+        layout.prop(self, "use_audio_tools")
+        if self.use_audio_tools:
+            
             layout = self.layout
-            layout.prop(self, "audio_scripts_path", text="path for audio scripts")
+            layout.prop(self, "audio_dir", text="path for audio files")
 
-        layout = self.layout
-        layout.prop(self, "audio_use_external_links", text="external audio sync")
 
-        layout = self.layout
-        layout.prop(self, "audio_use_external_links")
+            if self.audio_scripts:
+                layout = self.layout
+                layout.prop(self, "audio_scripts_path", text="path for audio scripts")
 
-        if self.audio_use_external_links:
             layout = self.layout
-            layout.prop(self, "audio_external_filename")
+            layout.prop(self, "audio_use_external_links", text="external audio sync")
 
-        # ECO
+            layout = self.layout
+            layout.prop(self, "audio_use_external_links")
 
-        layout = self.layout
-        layout.label("---------- Eco default parameters")
-
-        layout = self.layout
-        layout.prop(self, "eco_value")
-
-        layout = self.layout
-        layout.prop(self, "eco_use_add_blend_mode")
-
-        layout = self.layout
-        layout.prop(self, "eco_offset")
-
-        # RANDOM EDITOR
-
-        layout = self.layout
-        layout.prop(self, "---------- random_frames")
-            
-        layout = self.layout
-        layout.prop(self, "random_selected_scene")
-            
-        layout = self.layout
-        layout.prop(self, "random_use_marker_subsets")
-            
-        layout = self.layout
-        layout.prop(self, "random_number_of_subsets")
+            if self.audio_use_external_links:
+                layout = self.layout
+                layout.prop(self, "audio_external_filename")
 
 
 
@@ -225,6 +226,8 @@ def register():
     # Add keyboard shortcut configuration
     kc = bpy.context.window_manager.keyconfigs.addon
     km = kc.keymaps.new(name='Frames')
+
+    # jump 1 second
     kmi = km.keymap_items.new('screenextra.frame_skip',
     'RIGHT_ARROW', 'PRESS', ctrl=True, shift=True)
     kmi.properties.back = False
@@ -233,18 +236,21 @@ def register():
     kmi.properties.back = True
 
     # jumptocut shortcuts
-    #km = kc.keymaps.new(name='SequencerCommon')
     kmi = km.keymap_items.new('sequencerextra.jumpprev',
     'Q', 'PRESS', ctrl=False, shift=False)
     kmi = km.keymap_items.new('sequencerextra.jumpnext',
     'W', 'PRESS', ctrl=False, shift=False)
 
-    #km = kc.keymaps.new(name='SequencerCommon')
-    kmi = km.keymap_items.new('sequencerextra.markprev',
+    #markers
+    kc = bpy.context.window_manager.keyconfigs.active
+    km = kc.keymaps.new(name='Screen')
+    kmi = km.keymap_items.new("screen.marker_jump",
     'Q', 'PRESS', ctrl=False, shift=True)
-    kmi = km.keymap_items.new('sequencerextra.marknext',
+    kmi.properties.next=False
+    kmi = km.keymap_items.new("screen.marker_jump",
     'W', 'PRESS', ctrl=False, shift=True)
-
+    kmi.properties.next=True
+    
 
 
 def unregister():
@@ -266,14 +272,14 @@ def unregister():
     km.keymap_items.remove(km.keymap_items['screenextra.frame_skip'])
     km.keymap_items.remove(km.keymap_items['screenextra.frame_skip'])
 
-    #km = kc.keymaps['SequencerCommon']
     km.keymap_items.remove(km.keymap_items['sequencerextra.jumpprev'])
     km.keymap_items.remove(km.keymap_items['sequencerextra.jumpnext'])
 
-    #km = kc.keymaps['SequencerCommon']
-    km.keymap_items.remove(km.keymap_items['sequencerextra.markprev'])
-    km.keymap_items.remove(km.keymap_items['sequencerextra.marknext'])
-
+    kc = bpy.context.window_manager.keyconfigs.active
+    km = kc.keymaps['Screen']
+    km.keymap_items.remove(km.keymap_items['screen.marker_jump'])
+    km.keymap_items.remove(km.keymap_items['screen.marker_jump'])
+    
 
 if __name__ == '__main__':
     register()

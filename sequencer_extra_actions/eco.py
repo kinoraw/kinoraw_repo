@@ -43,8 +43,11 @@ class EcoPanel(bpy.types.Panel):
     def poll(self, context):
         strip = functions.act_strip(context)
         scn = context.scene
+        preferences = bpy.context.user_preferences
+        prefs = preferences.addons['sequencer_extra_actions'].preferences
         if scn and scn.sequence_editor and scn.sequence_editor.active_strip:
-            return strip.type in ('META')
+            if prefs.use_eco_tools:
+                return strip.type in ('META')
         else:
             return False
     
