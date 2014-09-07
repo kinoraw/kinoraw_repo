@@ -19,7 +19,7 @@
 bl_info = {
     "name": "Extra Sequencer Actions",
     "author": "Turi Scandurra, Carlos Padial",
-    "version": (3, 10),
+    "version": (3, 11),
     "blender": (2, 70, 0),
     "category": "Sequencer",
     "location": "Sequencer",
@@ -38,6 +38,7 @@ if "bpy" in locals():
     imp.reload(recursive_loader)
     imp.reload(jumptocut)
     imp.reload(eco)
+    imp.reload(random_editor)
     imp.reload(ui)
 else:
     from . import operators_extra_actions
@@ -46,6 +47,7 @@ else:
     from . import recursive_loader
     from . import jumptocut
     from . import eco
+    from . import random_editor
     from . import ui
 
 import bpy
@@ -114,12 +116,32 @@ class ProxyAddon(bpy.types.AddonPreferences):
         name = 'use_add_blend_mode',
         default = False)
 
+    # random editor
+
+    random_frames = IntProperty(
+            name='frames',
+            default=1,
+            min = 1, max = 1000)
+            
+    random_selected_scene = StringProperty(
+        name = 'selected_scene',
+        default = 'pessics3.limpio')
+        
+    random_use_marker_subsets = BoolProperty(
+        name = 'use_marker_subsets',
+        default = True)
+        
+    random_number_of_subsets = IntProperty(
+        name = 'number_of_subsets',
+        default = 3,
+        min = 1, max = 5)
+
     def draw(self, context):
 
         # PROXY
 
         layout = self.layout
-        layout.label("Proxy Tools default parameters")
+        layout.label("---------- Proxy Tools default parameters")
 
         layout = self.layout
         layout.prop(self, "proxy_dir")
@@ -134,7 +156,7 @@ class ProxyAddon(bpy.types.AddonPreferences):
         # AUDIO
 
         layout = self.layout
-        layout.label("Audio Tools default parameters")
+        layout.label("---------- Audio Tools default parameters")
         
         layout = self.layout
         layout.prop(self, "audio_dir", text="path for audio files")
@@ -157,7 +179,7 @@ class ProxyAddon(bpy.types.AddonPreferences):
         # ECO
 
         layout = self.layout
-        layout.label("Eco default parameters")
+        layout.label("---------- Eco default parameters")
 
         layout = self.layout
         layout.prop(self, "eco_value")
@@ -168,9 +190,19 @@ class ProxyAddon(bpy.types.AddonPreferences):
         layout = self.layout
         layout.prop(self, "eco_offset")
 
+        # RANDOM EDITOR
 
-
-
+        layout = self.layout
+        layout.prop(self, "---------- random_frames")
+            
+        layout = self.layout
+        layout.prop(self, "random_selected_scene")
+            
+        layout = self.layout
+        layout.prop(self, "random_use_marker_subsets")
+            
+        layout = self.layout
+        layout.prop(self, "random_number_of_subsets")
 
 
 
@@ -201,17 +233,17 @@ def register():
     kmi.properties.back = True
 
     # jumptocut shortcuts
-    km = kc.keymaps.new(name='Jumptocut')
-    kmi = km.keymap_items.new('sequencer.jumpprev',
+    #km = kc.keymaps.new(name='SequencerCommon')
+    kmi = km.keymap_items.new('sequencerextra.jumpprev',
     'Q', 'PRESS', ctrl=False, shift=False)
-    kmi = km.keymap_items.new('sequencer.jumpnext',
+    kmi = km.keymap_items.new('sequencerextra.jumpnext',
     'W', 'PRESS', ctrl=False, shift=False)
 
-    km = kc.keymaps.new(name='Jumptomark')
-    kmi = km.keymap_items.new('sequencer.markprev',
-    'Q', 'PRESS', ctrl=True, shift=True)
-    kmi = km.keymap_items.new('sequencer.marknext',
-    'W', 'PRESS', ctrl=True, shift=True)
+    #km = kc.keymaps.new(name='SequencerCommon')
+    kmi = km.keymap_items.new('sequencerextra.markprev',
+    'Q', 'PRESS', ctrl=False, shift=True)
+    kmi = km.keymap_items.new('sequencerextra.marknext',
+    'W', 'PRESS', ctrl=False, shift=True)
 
 
 
@@ -234,13 +266,13 @@ def unregister():
     km.keymap_items.remove(km.keymap_items['screenextra.frame_skip'])
     km.keymap_items.remove(km.keymap_items['screenextra.frame_skip'])
 
-    km = kc.keymaps['Jumptocut']
-    km.keymap_items.remove(km.keymap_items['sequencer.jumpprev'])
-    km.keymap_items.remove(km.keymap_items['sequencer.jumpnext'])
+    #km = kc.keymaps['SequencerCommon']
+    km.keymap_items.remove(km.keymap_items['sequencerextra.jumpprev'])
+    km.keymap_items.remove(km.keymap_items['sequencerextra.jumpnext'])
 
-    km = kc.keymaps['Jumptomark']
-    km.keymap_items.remove(km.keymap_items['sequencer.markprev'])
-    km.keymap_items.remove(km.keymap_items['sequencer.marknext'])
+    #km = kc.keymaps['SequencerCommon']
+    km.keymap_items.remove(km.keymap_items['sequencerextra.markprev'])
+    km.keymap_items.remove(km.keymap_items['sequencerextra.marknext'])
 
 
 if __name__ == '__main__':

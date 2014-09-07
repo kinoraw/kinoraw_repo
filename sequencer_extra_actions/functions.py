@@ -437,10 +437,7 @@ def geteditpoints(seq):
     return editpoints
 
 
-def return_data_jumptocut():
-    # given a frame, returns next_edit_point, prev_edit_point, next_marker, previous_marker
-    return
-#------------ random edit functions...
+#------------ .........................  REVISAR
 
 def randompartition(lst,n,rand):
     division = len(lst) / float(n)
@@ -461,3 +458,93 @@ def randompartition(lst,n,rand):
         newlist.append([lst[count : int(lista[i]-1)+count]])
         count += int(lista[i]) 
     return newlist
+
+
+#------------ random editor functions.
+
+def randomframe(strip):
+    #random frame between a and b
+    a = strip.frame_start
+    b = strip.frame_final_duration
+    rand = a+int(random.random()*b)
+    #print(a, a+b, rand)
+    return rand
+
+
+#
+"""
+def get_matching_markers(scene, name=None):
+    '''return a list of markers with same name 
+     from the scene, or all markers if name is None'''
+    selected_markers=[]
+    markers = scene.timeline_markers
+    for mark in markers:
+        #print(mark.name, name)
+        if mark.name == name or name==None:
+            selected_markers.append(mark.frame)
+    return selected_markers
+
+
+def generate_subsets_list(number_of_subsets):
+    #generate marker subsets list
+    subset_list = []
+    subset_names = ['A','B','C','D','E','F']
+    for subset in range(number_of_subsets):
+        subset_list.append(subset_names[subset])
+    return subset_list
+"""
+
+def get_marker_dict(scene, number_of_subsets):
+    '''return a dict where: 
+            keys = subset names
+            values = list of markers'''
+    #get markers from scene
+    markers = scene.timeline_markers
+    subset_list = generate_subsets_list(number_of_subsets)
+    #generate dict with a list for each subset
+    marker_dict = {}
+    for subset in subset_list:
+        list=get_matching_markers(scene, subset)
+        marker_dict[subset] = list
+    return marker_dict
+
+
+def get_cut_dict(scene, number_of_subsets):
+    '''return a dict where: 
+            keys = markers in the scene + start and end
+            values = duration in frames from key marker to next marker'''
+    #generate cut_list
+    
+    list=get_matching_markers(scene)
+    list.append(scene.frame_start)
+    list.append(scene.frame_end)
+    list.sort()
+    #print("lista:",len(list),list)
+    cut_dict ={}
+    for i, j in enumerate(list):
+        try:
+            #print(j,list[i+1]-1-j)
+            cut_dict[j] = list[i+1]-j
+        except IndexError:
+            continue  
+    return cut_dict
+    
+
+def random_edit_from_random_subset(cut_dict, sources_dict):
+    '''return a random edit from random subsets'''
+    #generate subset list (strings)
+    subset_list = generate_subsets_list(number_of_subsets)
+    # copy sources_dict
+    random_edit = []
+    for cut in sorted(cut_dict.keys()):
+        #escoge un subset al azar:   
+        rand = random.randrange(number_of_subsets)
+        subset = subset_list[rand]
+        #check if source subset is empty
+        print(len(sources_dict[subset]),subset)
+        if len(sources_dict[subset]) == 0:
+            sources_dict[subset] = get_matching_markers(selected_scene, subset)
+            print("repeating "+ subset + " clips")
+        marker = sources_dict[subset].pop()
+        random_edit.append((cut, cut_dict[cut], subset, marker))
+    return random_edit

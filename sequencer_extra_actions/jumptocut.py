@@ -25,7 +25,7 @@ from . import functions
 
 class OBJECT_OT_Setinout(bpy.types.Operator):
     bl_label = "Mark in & out to active strip"
-    bl_idname = "sequencer.setinout"
+    bl_idname = "sequencerextra.setinout"
     bl_description = "set IN and OUT markers to the active strip limits"
 
     def invoke(self, context, event):
@@ -54,7 +54,7 @@ class OBJECT_OT_Setinout(bpy.types.Operator):
 
 class OBJECT_OT_Triminout(bpy.types.Operator):
     bl_label = "Trim to in & out"
-    bl_idname = "sequencer.triminout"
+    bl_idname = "sequencerextra.triminout"
     bl_description = "trim the selected strip to IN and OUT markers (if exists)"
 
     def invoke(self, context, event):
@@ -77,7 +77,7 @@ class OBJECT_OT_Triminout(bpy.types.Operator):
 #JUMP
 class OBJECT_OT_Jumpprev(bpy.types.Operator):  #Operator jump previous edit point
     bl_label = "Cut previous"
-    bl_idname = "sequencer.jumpprev"
+    bl_idname = "sequencerextra.jumpprev"
     bl_description = "jump to previous edit point"
 
     editpoints = []
@@ -91,7 +91,7 @@ class OBJECT_OT_Jumpprev(bpy.types.Operator):  #Operator jump previous edit poin
 
 class OBJECT_OT_Jumpnext(bpy.types.Operator):  #Operator jump next edit point
     bl_label = "Cut next"
-    bl_idname = "sequencer.jumpnext"
+    bl_idname = "sequencerextra.jumpnext"
     bl_description = "jump to next edit point"
 
     def invoke(self, context, event):
@@ -111,7 +111,7 @@ class OBJECT_OT_Jumpnext(bpy.types.Operator):  #Operator jump next edit point
 # MARKER
 class OBJECT_OT_Markerprev(bpy.types.Operator):
     bl_label = "Marker previous"
-    bl_idname = "sequencer.markprev"
+    bl_idname = "sequencerextra.markprev"
     bl_description = "jump to previous marker"
 
     def invoke(self, context, event):
@@ -124,7 +124,7 @@ class OBJECT_OT_Markerprev(bpy.types.Operator):
 
 class OBJECT_OT_Markernext(bpy.types.Operator):
     bl_label = "Marker next"
-    bl_idname = "sequencer.marknext"
+    bl_idname = "sequencerextra.marknext"
     bl_description = "jump to next marker"
 
     def invoke(self, context, event):
@@ -139,7 +139,7 @@ class OBJECT_OT_Markernext(bpy.types.Operator):
 
 class OBJECT_OT_Sourcein(bpy.types.Operator):  #Operator source in
     bl_label = "Source IN"
-    bl_idname = "sequencer.sourcein"
+    bl_idname = "sequencerextra.sourcein"
     bl_description = "add a marker named IN"
 
     def invoke(self, context, event):
@@ -177,7 +177,7 @@ class OBJECT_OT_Sourcein(bpy.types.Operator):  #Operator source in
 
 class OBJECT_OT_Sourceout(bpy.types.Operator):  #Operator source out
     bl_label = "Source OUT"
-    bl_idname = "sequencer.sourceout"
+    bl_idname = "sequencerextra.sourceout"
     bl_description = "add a marker named OUT"
 
     def invoke(self, context, event):
@@ -213,7 +213,7 @@ class OBJECT_OT_Sourceout(bpy.types.Operator):  #Operator source out
 
 class OBJECT_OT_Setstartend(bpy.types.Operator):  #Operator set start & end
     bl_label = "set Start & End"
-    bl_idname = "sequencer.setstartend"
+    bl_idname = "sequencerextra.setstartend"
     bl_description = "set Start = In and End = Out"
 
     def invoke(self, context, event):
@@ -237,7 +237,7 @@ class OBJECT_OT_Setstartend(bpy.types.Operator):  #Operator set start & end
 
 class OBJECT_OT_Metacopy(bpy.types.Operator):  #Operator copy source in/out
     bl_label = "Trim & Meta-Copy"
-    bl_idname = "sequencer.metacopy"
+    bl_idname = "sequencerextra.metacopy"
     bl_description = "make meta from selected strips, trim it to in/out (if available) and copy it to clipboard"
 
     def invoke(self, context, event):
@@ -250,16 +250,16 @@ class OBJECT_OT_Metacopy(bpy.types.Operator):  #Operator copy source in/out
             if "IN" and "OUT" in markers:
                 sin=markers["IN"].frame
                 sout=markers["OUT"].frame
-                bpy.ops.sequencer.meta_make()
+                bpy.ops.sequencerextra.meta_make()
                 strip2= seq.active_strip
                 functions.triminout(strip2,sin,sout)
-                bpy.ops.sequencer.copy()
-                bpy.ops.sequencer.meta_separate()
+                bpy.ops.sequencerextra.copy()
+                bpy.ops.sequencerextra.meta_separate()
                 self.report({'INFO'}, "META has been trimed and copied")
             else:
-                bpy.ops.sequencer.meta_make()
-                bpy.ops.sequencer.copy()
-                bpy.ops.sequencer.meta_separate()
+                bpy.ops.sequencerextra.meta_make()
+                bpy.ops.sequencerextra.copy()
+                bpy.ops.sequencerextra.meta_separate()
                 self.report({'WARNING'}, "No In & Out!! META has been copied")
         else:
             self.report({'ERROR'}, "No strip selected")
@@ -267,14 +267,14 @@ class OBJECT_OT_Metacopy(bpy.types.Operator):  #Operator copy source in/out
 
 class OBJECT_OT_Metapaste(bpy.types.Operator):  #Operator paste source in/out
     bl_label = "Paste in current Frame"
-    bl_idname = "sequencer.metapaste"
+    bl_idname = "sequencerextra.metapaste"
     bl_description = "paste source from clipboard to current frame"
 
     def invoke(self, context, event):
         # rehacer
         scene=bpy.context.scene
-        bpy.ops.sequencer.paste()
-        bpy.ops.sequencer.snap(frame=scene.frame_current)
+        bpy.ops.sequencerextra.paste()
+        bpy.ops.sequencerextra.snap(frame=scene.frame_current)
         return {'FINISHED'}
 
 
@@ -309,42 +309,39 @@ class Jumptocut(bpy.types.Panel):
         layout = self.layout
 
         row=layout.row()
-        split=row.split(percentage=0.5)
+        split=row.split(percentage=0.25)
         colL = split.column()
         colR = split.column()
-        colL.operator("sequencer.jumpprev", icon="PLAY_REVERSE")
-        colR.operator("sequencer.jumpnext", icon='PLAY')
+        colL.operator("sequencerextra.jumpprev", icon="PLAY_REVERSE", text="")
+        colR.operator("sequencerextra.jumpnext", icon='PLAY', text="")
 
-        row=layout.row()
-        split=row.split()
+        #row=layout.row()
+        #split=row.split()
         colL = split.column()
         colR = split.column()
-        colL.operator("sequencer.markprev", icon="MARKER_HLT")
-        colR.operator("sequencer.marknext", icon='MARKER_HLT')
+        colL.operator("sequencerextra.markprev", icon="MARKER_HLT", text="")
+        colR.operator("sequencerextra.marknext", icon='MARKER_HLT', text="")
 
         row=layout.row()
-        split=row.split()
+        split=row.split(percentage=0.33)
         colL1 = split.column()
         colL2 = split.column()
-        colL1.operator("sequencer.sourcein", icon="REW")
-        colL2.operator("sequencer.sourceout", icon='FF')
-
-
-        row=layout.row()
-        split=row.split()
         colR1 = split.column()
-        colR1.operator("sequencer.setinout", icon="ARROW_LEFTRIGHT")
+        colL1.operator("sequencerextra.sourcein", icon="REW", text="")
+        colL2.operator("sequencerextra.sourceout", icon='FF', text="")
+        colR1.operator("sequencerextra.setinout", icon="ARROW_LEFTRIGHT", text="")
+        
         row=layout.row()
-        split=row.split(percentage=0.5)
+        split=row.split(percentage=0.25)
         colR1 = split.column()
-        colR1.operator("sequencer.triminout", icon="FULLSCREEN_EXIT")
+        colR1.operator("sequencerextra.triminout", icon="FULLSCREEN_EXIT", text="")
         colR2 = split.column()
-        colR2.operator("sequencer.setstartend", icon="SETTINGS")
+        colR2.operator("sequencerextra.setstartend", icon="SETTINGS", text="")
 
-        row=layout.row()
-        split=row.split()
+        #row=layout.row()
+        #split=row.split()
         colR1 = split.column()
         colR2 = split.column()
-        colR1.operator("sequencer.metacopy", icon="COPYDOWN")
-        colR2.operator("sequencer.metapaste", icon='PASTEDOWN')
+        colR1.operator("sequencerextra.metacopy", icon="COPYDOWN", text="")
+        colR2.operator("sequencerextra.metapaste", icon='PASTEDOWN', text="")
 
