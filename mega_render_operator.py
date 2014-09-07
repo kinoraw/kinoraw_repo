@@ -18,12 +18,12 @@
 
 bl_info = {
     "name": "Mega Render",
-    "author": "Carlos Padial",
-    "version": (0, 1),
-    "blender": (2, 70, 0),
+    "author": "Carlos Padial, Ferhoyo",
+    "version": (0, 11),
+    "blender": (2, 71, 0),
     "category": "Sequencer",
     "location": "Sequencer",
-    "description": "mega render operator",
+    "description": "mega render operator with log file",
     "warning": "",
     "wiki_url": "http://kinoraw.net",
     "tracker_url": "http://kinoraw.net",
@@ -82,7 +82,7 @@ class GenerateMegaRenderOperator(bpy.types.Operator):
     def execute(self, context):
         
         preferences = context.user_preferences
-        prefs = preferences.addons['megarenderoperator'].preferences
+        prefs = preferences.addons['mega_render_operator2'].preferences
 
         blenderpath = prefs.blenderpath
         scriptfilename = bpy.path.abspath(prefs.scriptfilename)
@@ -104,17 +104,24 @@ class GenerateMegaRenderOperator(bpy.types.Operator):
         #tramos, blendfile, sce, scriptfilename
 
         # generate the script
+        log_file = bpy.path.abspath("//render.log")
         text_file = open(bpy.path.abspath(scriptfilename), "w")
-        text_file.write("#!/bin/bash")
+        text_file.write("#!/bin/bash\necho \"$(date +'%a %d %b %Y - %H:%M:%S'):\" > {}".format(log_file))
         for i, j in enumerate(tramos):
-            text_file.write( ("\n(\necho '#Rendering part {}' ;\nSTART_RENDER=$(date +'%s');\nRENDERED=$(").format(i))
-            command = "{} {} -b -S {} -s {} -e {} -a".format(blenderpath, blendfile, sce.name, j[0], j[1])
-            text_file.write(command)
-            text_file.write(" | grep -c Saved) \nEND_RENDER=$(date +'%s');\nRENDERING_SECS=$(($END_RENDER-$START_RENDER))\n")
-            command = """if [ $RENDERED -eq {} ]\nthen\n   echo \"#Finished frame {} to {} in $(printf '%dh:%dm:%ds' $(($RENDERING_SECS/3600)) $(($RENDERING_SECS%3600/60)) $(($RENDERING_SECS%60)))\"\nelse\n   echo \"#Errors in script {}\"\nfi\n ) | zenity --progress --pulsate --no-cancel --title='Part {}'""".format(j[1]-j[0]+1, j[0],j[1], i, i)
-            text_file.write(command)
+            text_file.write(("\n(\necho '#Rendering part {}'\nSTART_RENDER=$(date +'%s')\n").format(i))
+            text_file.write("RESULT=$({} {} -b -S {} -s {} -e {} -a 2>&1".format(blenderpath, blendfile, sce.name, j[0], j[1]))
+            text_file.write(" | grep 'Saved\|Append\|not an anim\|unknown fileformat') \nEND_RENDER=$(date +'%s')\nRENDERING_SECS=$(($END_RENDER-$START_RENDER))\nLINEAS=$(echo \"$RESULT\" | wc -l)\n")
+            text_file.write("if [ $LINEAS -eq {} ];then\n".format(j[1]-j[0]+1))
+            text_file.write("   echo \"#Finished frame {} to {} in $(printf '%dh:%dm:%ds' $(($RENDERING_SECS/3600)) $(($RENDERING_SECS%3600/60)) $(($RENDERING_SECS%60)))\"\nelse\n".format(j[0],j[1])) 
+            text_file.write("   RESULT=$(echo \"$RESULT\" | sed -n '/\\(unknown fileformat\\|not an anim\\)/{N;p;}')\n")
+            text_file.write("   RESULT=$(echo \"$RESULT\" | sed 's/Saved/Error on rendered image/;s/Append/Error on/;s/Time.*//;s/.*unknown fileformat/unknown fileformat/')\n")   
+            text_file.write("   echo \"$RESULT\" | sed '/Error/G' >> {}\n".format(log_file))   
+
+            text_file.write("   echo \"#One or more errors were found\\nplease see render.log for details\"\nfi\n )")
+            text_file.write("| zenity --progress --pulsate --no-cancel --title='Part {}'".format(i))
+
             if i < len(tramos)-1:
-                #print(i, len(tramos)-1)
+                print(i, len(tramos)-1)
                 text_file.write(" & \n")
         text_file.close()
 
@@ -131,12 +138,12 @@ class LaunchMegaRenderOperator(bpy.types.Operator):
     @classmethod
     def poll(self, context):
         preferences = context.user_preferences
-        prefs = preferences.addons['megarenderoperator'].preferences
+        prefs = preferences.addons['mega_render_operator2'].preferences
         return os.path.isfile(bpy.path.abspath(prefs.scriptfilename))
 
     def execute(self, context):
         preferences = context.user_preferences
-        prefs = preferences.addons['megarenderoperator'].preferences
+        prefs = preferences.addons['mega_render_operator2'].preferences
         scriptfilename = bpy.path.abspath(prefs.scriptfilename)
         command = "sh "+scriptfilename
         print("ejecutando {}".format(scriptfilename))
@@ -159,7 +166,7 @@ class MegaRenderPanel(bpy.types.Panel):
     def draw(self, context):
 
         preferences = context.user_preferences
-        prefs = preferences.addons['megarenderoperator'].preferences
+        prefs = preferences.addons['mega_render_operator2'].preferences
         number_of_threads = prefs.number_of_threads
 
         layout = self.layout
@@ -173,13 +180,13 @@ class MegaRenderPanel(bpy.types.Panel):
 
 
 class MegaRenderAddon(bpy.types.AddonPreferences):
-    bl_idname = "megarenderoperator"
+    bl_idname = "mega_render_operator2"
     bl_option = {'REGISTER'}
 
     blenderpath = StringProperty(
         name="blender executable path",
         description="blender executable path",
-        default="~/soft/blender-2.70a-linux-glibc211-x86_64/blender")
+        default="~/soft/blender-2.71-linux-glibc211-x86_64/blender")
 
     scriptfilename = StringProperty(
         name="script filename",
@@ -195,7 +202,7 @@ class MegaRenderAddon(bpy.types.AddonPreferences):
     def draw(self, context):   
         layout = self.layout
         layout.prop(self, "blenderpath")
-        layout.prop(self, "scriptspath")
+        layout.prop(self, "scriptfilename")
         layout.prop(self, "number_of_threads")
             
 
