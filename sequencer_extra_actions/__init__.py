@@ -20,7 +20,7 @@ bl_info = {
     "name": "Extra Sequencer Actions",
     "author": "Turi Scandurra, Carlos Padial",
     "version": (3, 11),
-    "blender": (2, 70, 0),
+    "blender": (2, 71, 0),
     "category": "Sequencer",
     "location": "Sequencer",
     "description": "Collection of extra operators to manipulate VSE strips",
