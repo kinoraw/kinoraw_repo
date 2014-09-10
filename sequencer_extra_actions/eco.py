@@ -53,7 +53,7 @@ class EcoPanel(bpy.types.Panel):
     
     def draw_header(self, context):
         layout = self.layout
-        layout.label(text="", icon="NLA")
+        layout.label(text="", icon="IPO_BOUNCE")
     
     def draw(self, context):
         scn = bpy.context.scene

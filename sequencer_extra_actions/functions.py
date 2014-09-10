@@ -17,17 +17,13 @@
 # ##### END GPL LICENSE BLOCK #####
 
 import bpy
-import os.path, operator, subprocess
+import os.path, operator, subprocess, random
 
 from bpy.props import IntProperty
 from bpy.props import FloatProperty
 from bpy.props import EnumProperty
 from bpy.props import BoolProperty
 from bpy.props import StringProperty
-
-
-# TODO add context argument to functions to get ride of bpy calls
-
 
 imb_ext_image = [
     # IMG
@@ -72,6 +68,9 @@ movieextdict = [("1", ".avi", ""),
 
 # Functions
 
+# initSceneProperties has to be removed as scene properties and 
+# recoded in __init__ as addon properties.
+# TODO: recode operator_exta_actions.py
 def initSceneProperties(context, scn):
     try:
         if context.scene.scene_initialized == True:
@@ -243,12 +242,12 @@ def detect_strip_type(filepath):
     return type
 
 
-def getpathfrombrowser():
+def getpathfrombrowser(context):
     '''
     returns path from filebrowser
     '''
-    scn = bpy.context.scene
-    for a in bpy.context.window.screen.areas:
+    scn = context.scene
+    for a in context.window.screen.areas:
         if a.type == 'FILE_BROWSER':
             params = a.spaces[0].params
             break
@@ -262,12 +261,12 @@ def getpathfrombrowser():
     return path
 
 
-def getfilepathfrombrowser():
+def getfilepathfrombrowser(context):
     '''
     returns path and file from filebrowser
     '''
-    scn = bpy.context.scene
-    for a in bpy.context.window.screen.areas:
+    scn = context.scene
+    for a in context.window.screen.areas:
         if a.type == 'FILE_BROWSER':
             params = a.spaces[0].params
             break
@@ -287,12 +286,12 @@ def getfilepathfrombrowser():
     return path, filename
 
 
-def setpathinbrowser(path, file):
+def setpathinbrowser(context, path, file):
     '''
     set path and file in the filebrowser
     '''
-    scn = bpy.context.scene
-    for a in bpy.context.window.screen.areas:
+    scn = context.scene
+    for a in context.window.screen.areas:
         if a.type == 'FILE_BROWSER':
             params = a.spaces[0].params
             break
@@ -322,7 +321,7 @@ def onefolder(context, recursive_select_by_extension, ext):
     returns a list of MOVIE type files from folder selected in file browser
     '''
     filelist = []
-    path, filename = getfilepathfrombrowser()
+    path, filename = getfilepathfrombrowser(context)
     
     for i in movieextdict: 
         if i[0] == ext:
@@ -350,7 +349,7 @@ def recursive(context, recursive_select_by_extension, ext):
     returns a list of MOVIE type files recursively from file browser
     '''
     filelist = []
-    path = getpathfrombrowser()
+    path = getpathfrombrowser(context)
     
     for i in movieextdict:
         if i[0] == ext:
@@ -375,8 +374,14 @@ def recursive(context, recursive_select_by_extension, ext):
 
 # jump to cut functions
 def triminout(strip, sin, sout):
-    start = strip.frame_start + strip.frame_offset_start
+    
+    start = strip.frame_start + strip.frame_offset_start - strip.frame_still_start
     end = start + strip.frame_final_duration
+
+    remove = False
+    if end < sin: remove = True
+    if start > sout: remove = True
+    
     if end > sin:
         if start < sin:
             strip.select_right_handle = False
@@ -389,7 +394,8 @@ def triminout(strip, sin, sout):
             strip.select_right_handle = True
             bpy.ops.sequencer.snap(frame=sout)
             strip.select_right_handle = False
-    return {'FINISHED'}
+
+    return remove
 
 def searchprev(j, list):
     list.sort(reverse=True)
@@ -409,11 +415,12 @@ def searchnext(j, list):
     else: result = j
     return result
 
-def geteditpoints(seq):
+# not used 
+def geteditpoints_old(seq):
     #this create a list of editpoints including strips from
     # inside metastrips. It reads only 1 level into the metastrip
     editpoints = []
-    cliplist = []
+    striplist = []
     metalist = []
     if seq:
         for i in seq.sequences:
@@ -424,11 +431,11 @@ def geteditpoints(seq):
                 editpoints.append(start)
                 editpoints.append(end)
             else:
-                cliplist.append(i)
+                striplist.append(i)
         for i in metalist:
             for j in i.sequences:
-                cliplist.append(j)
-        for i in cliplist:
+                striplist.append(j)
+        for i in striplist:
             start = i.frame_start + i.frame_offset_start
             end = start + i.frame_final_duration
             editpoints.append(start)
@@ -436,6 +443,26 @@ def geteditpoints(seq):
             #print(start," ",end)
     return editpoints
 
+def geteditpoints(context):
+    #this create a list of editpoints from current meta_stack level
+    scn = context.scene
+    seq = scn.sequence_editor
+
+    editpoints=[]
+    striplist=[]
+
+    if len(seq.meta_stack) > 0:
+        striplist = seq.sequences_all[seq.meta_stack[len(seq.meta_stack)-1].name].sequences 
+    else:
+        striplist = seq.sequences
+
+    for strip in striplist:
+        i = seq.sequences_all[strip.name]
+        start = i.frame_start + i.frame_offset_start - i.frame_still_start
+        end = start + i.frame_final_duration 
+        editpoints.append(start)
+        editpoints.append(end)
+    return editpoints
 
 #------------ .........................  REVISAR
 

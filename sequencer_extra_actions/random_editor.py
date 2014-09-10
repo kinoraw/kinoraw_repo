@@ -205,6 +205,9 @@ class RandomEditorPanel(bpy.types.Panel):
 
     #def invoke(self, context, event):
 
+    def draw_header(self, context):
+        layout = self.layout
+        layout.label(text="", icon="IPO_BOUNCE")
 
     def draw(self, context):
 

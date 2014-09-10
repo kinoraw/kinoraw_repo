@@ -291,6 +291,10 @@ class CreateAudioToolPanel(bpy.types.Panel):
         else:
             return False
 
+    def draw_header(self, context):
+        layout = self.layout
+        layout.label(text="", icon="IPO_BOUNCE")
+
     def draw(self, context):
 
         preferences = bpy.context.user_preferences

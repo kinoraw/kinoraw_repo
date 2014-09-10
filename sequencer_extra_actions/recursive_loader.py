@@ -129,7 +129,7 @@ class Sequencer_Extra_RecursiveLoader(bpy.types.Operator):
         scn = context.scene
         if filelist:
             for i in filelist:
-                functions.setpathinbrowser(i[0], i[1])
+                functions.setpathinbrowser(context, i[0], i[1])
                 try:
                     if self.recursive_proxies:
                         bpy.ops.sequencerextra.placefromfilebrowserproxy(
@@ -276,14 +276,18 @@ class ExifInfoPanel(bpy.types.Panel):
     def poll(self, context):
         strip = functions.act_strip(context)
         scn = context.scene
+        preferences = bpy.context.user_preferences
+        prefs = preferences.addons['sequencer_extra_actions'].preferences
+        
         if scn and scn.sequence_editor and scn.sequence_editor.active_strip:
-            return strip.type in ('MOVIE')
+            if prefs.use_exif_panel:
+                return strip.type in ('MOVIE')
         else:
             return False
 
     def draw_header(self, context):
         layout = self.layout
-        layout.label(text="", icon="NLA")
+        layout.label(text="", icon="IPO_BOUNCE")
 
     def draw(self, context):
         layout = self.layout
