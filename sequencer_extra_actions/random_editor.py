@@ -45,7 +45,7 @@ class RandomScratchOperator(bpy.types.Operator):
 
     def invoke(self, context, event):
         
-        preferences = bpy.context.user_preferences
+        preferences = context.user_preferences
         random_frames = preferences.addons['sequencer_extra_actions'].preferences.random_frames
 
         sce = context.scene
@@ -195,7 +195,7 @@ class RandomEditorPanel(bpy.types.Panel):
     def poll(self, context):
         strip = functions.act_strip(context)
         scn = context.scene
-        preferences = bpy.context.user_preferences
+        preferences = context.user_preferences
         prefs = preferences.addons['sequencer_extra_actions'].preferences
         if scn and scn.sequence_editor and scn.sequence_editor.active_strip:
             if prefs.use_random_editor:
@@ -211,7 +211,7 @@ class RandomEditorPanel(bpy.types.Panel):
 
     def draw(self, context):
 
-        preferences = bpy.context.user_preferences
+        preferences = context.user_preferences
         prefs = preferences.addons['sequencer_extra_actions'].preferences
 
         layout = self.layout

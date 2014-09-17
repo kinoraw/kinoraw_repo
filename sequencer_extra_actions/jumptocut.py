@@ -22,6 +22,8 @@ import bpy
 from . import functions
 from bpy.props import IntProperty, BoolProperty
 
+from bpy.app.handlers import persistent
+
 
 class OBJECT_OT_Setinout(bpy.types.Operator):
     bl_label = "set IN and OUT to selected"
@@ -39,6 +41,8 @@ class OBJECT_OT_Setinout(bpy.types.Operator):
             return False
 
     def execute(self, context):
+        functions.initSceneProperties(context)
+        
         scn = context.scene
         markers =scn.timeline_markers
         seq = scn.sequence_editor
@@ -51,31 +55,37 @@ class OBJECT_OT_Setinout(bpy.types.Operator):
         tl_start = 300000
         tl_end = -300000
         for i in context.selected_editable_sequences:
-            #try:
             if i.select == True:
                 start = i.frame_start + i.frame_offset_start - i.frame_still_start
-                end = start + i.frame_final_duration + 1
+                end = start + i.frame_final_duration
                 if start < tl_start:
                     tl_start = start
-                print("eooooo")
                 if end > tl_end:
-                    tl_end = end - 1
-                print(tl_start,tl_end)
-            #except AttributeError as Error:
-            #    print("##### ;-P  ", Error)
+                    tl_end = end
+                #print(tl_start,tl_end)
 
-        if "IN" not in markers:
-            mark=markers.new(name="IN")
-            mark.frame=tl_start
+        
+        if scn.auto_markers:
+            scn.in_marker = tl_start
+            scn.out_marker = tl_end
         else:
-            mark=markers["IN"]
-            mark.frame=tl_start
-        if "OUT" not in markers:
-            mark= markers.new(name="OUT")
-            mark.frame=tl_end
-        else:
-            mark=markers["OUT"]
-            mark.frame=tl_end
+            scn.in_marker = tl_start
+            scn.out_marker = tl_end
+
+            if "IN" in markers:
+                mark=markers["IN"]
+                mark.frame=scn.in_marker
+            else:
+                mark=markers.new(name="IN")
+                mark.frame=scn.in_marker   
+
+            if "OUT" in markers:
+                mark=markers["OUT"]
+                mark.frame=scn.out_marker
+            else:
+                mark=markers.new(name="OUT")
+                mark.frame=scn.in_marker 
+
         return {'FINISHED'}
 
 
@@ -99,29 +109,28 @@ class OBJECT_OT_Triminout(bpy.types.Operator):
    
     
     def execute(self, context):
+
         scene=context.scene
         seq=scene.sequence_editor
+
+        meta_level = len(seq.meta_stack)
+        if meta_level > 0:
+            seq = seq.meta_stack[meta_level - 1]
+        
         markers=scene.timeline_markers
         sin=markers["IN"].frame
         sout=markers["OUT"].frame
         strips = context.selected_editable_sequences
+        #(triminout function only works fine 
+        # with one strip selected at a time)
         for strip in strips:
             #deselect all other strips 
-            #(triminout function only works fine 
-            # with one strip selected at a time)
-            for i in strips: 
-                try:
-                    i.select = False
-                except ReferenceError:
-                    pass
+            for i in strips: i.select = False
             #select current strip
             strip.select = True
             remove=functions.triminout(strip,sin,sout)
             if remove == True:
-                seq.sequences.remove(strip)
-                #this strip should be deleted from strips list...
-                #so i need some exceptions around
-        
+                bpy.ops.sequencer.delete()
         #select all strips again
         for strip in strips:
             try: 
@@ -188,36 +197,38 @@ class OBJECT_OT_Sourcein(bpy.types.Operator):  #Operator source in
             return False
 
     def execute(self, context):
-        scene=bpy.context.scene
-        seq = scene.sequence_editor
-        markers=scene.timeline_markers
-        if "OUT" in markers:
-            sout=markers["OUT"]
-            if scene.frame_current <= sout.frame:
-                if "IN" not in markers:
-                    sin=markers.new(name="IN")
-                    sin.frame=scene.frame_current
-                else:
-                    sin=markers["IN"]
-                    sin.frame=scene.frame_current
-            #trying to set in after out
-            else:
-                if "IN" not in markers:
-                    sin=markers.new(name="IN")
-                    sin.frame=sout.frame
-                else:
-                    sin=markers["IN"]
-                    sin.frame=sout.frame
-                self.report({'WARNING'},'IN after OUT')
+        functions.initSceneProperties(context)
+        scn=context.scene
+        seq = scn.sequence_editor
+        markers=scn.timeline_markers
+        
+        if scn.auto_markers:
+            scn.in_marker = scn.frame_current
+
         else:
-            if "IN" not in markers:
-                sin=markers.new(name="IN")
-                sin.frame=scene.frame_current
+            scn.in_marker = scn.frame_current
+            if "IN" in markers:
+                mark=markers["IN"]
+                mark.frame=scn.in_marker
             else:
-                sin=markers["IN"]
-                sin.frame=scene.frame_current
-        if seq:
-            bpy.ops.sequencer.reload()
+                mark=markers.new(name="IN")
+                mark.frame=scn.in_marker   
+
+            #limit OUT marker position with IN marker
+            if scn.in_marker > scn.out_marker:
+                scn.out_marker = scn.in_marker
+
+            if "OUT" in markers:
+                mark=markers["OUT"]
+                mark.frame=scn.out_marker
+                        
+
+        for m in markers:
+            m.select = False
+            if m.name in {"IN", "OUT"}:
+                m.select = True
+        bpy.ops.sequencer.reload()
+
         return {'FINISHED'}
 
 class OBJECT_OT_Sourceout(bpy.types.Operator):  #Operator source out
@@ -237,32 +248,33 @@ class OBJECT_OT_Sourceout(bpy.types.Operator):  #Operator source out
             return False
 
     def execute(self, context):
-        scene=bpy.context.scene
-        seq = scene.sequence_editor
-        markers=scene.timeline_markers
-        if "IN" in markers:
-            sin=markers["IN"]
-            if scene.frame_current >= sin.frame:
-                if "OUT" not in markers:
-                    sout= markers.new(name="OUT")
-                    sout.frame=scene.frame_current
-                else:
-                    sout=markers["OUT"]
-                    sout.frame=scene.frame_current
-            #trying to set out before in
-            else:
-                if "OUT" not in markers:
-                    sout= markers.new(name="OUT")
-                    sout.frame = sin.frame
-                else:
-                    sout=markers["OUT"]
-                    sout.frame = sin.frame
-                self.report({'WARNING'}, "OUT before IN")
+        scn=context.scene
+        functions.initSceneProperties(context)
+        seq = scn.sequence_editor
+        markers=scn.timeline_markers
+        
+        if scn.auto_markers:
+            scn.out_marker = scn.frame_current
+
         else:
-            sout= markers.new(name="OUT")
-            sout.frame=scene.frame_current
-        if seq:
-            bpy.ops.sequencer.reload()
+            scn.out_marker = scn.frame_current
+
+            #limit OUT marker position with IN marker
+            if scn.out_marker < scn.in_marker:
+                scn.out_marker = scn.in_marker
+
+            if "OUT" in markers:
+                mark=markers["OUT"]
+                mark.frame=scn.out_marker
+            else:
+                mark=markers.new(name="OUT")
+                mark.frame=scn.out_marker   
+                        
+        for m in markers:
+            m.select = False
+            if m.name in {"IN", "OUT"}:
+                m.select = True
+        bpy.ops.sequencer.reload()
         return {'FINISHED'}
 
 class OBJECT_OT_Setstartend(bpy.types.Operator):  #Operator set start & end
@@ -282,12 +294,13 @@ class OBJECT_OT_Setstartend(bpy.types.Operator):  #Operator set start & end
             return False
 
     def execute(self, context):
+        functions.initSceneProperties(context)
         scn=context.scene
         markers=scn.timeline_markers
         sin=markers["IN"]
         sout=markers["OUT"]
         scn.frame_start = sin.frame
-        scn.frame_end = sout.frame
+        scn.frame_end = sout.frame - 1
         bpy.ops.sequencer.reload()
         return {'FINISHED'}
 
@@ -347,7 +360,7 @@ class OBJECT_OT_Metapaste(bpy.types.Operator):  #Operator paste source in/out
 class OBJECT_OT_Unmetatrim(bpy.types.Operator):  #Operator paste source in/out
     bl_label = "Paste in current Frame"
     bl_idname = "sequencerextra.meta_separate_trim"
-    bl_description = "set in and out to meta, unmeta and trim the content"
+    bl_description = "unmeta and trim the content to meta duration"
     
     bl_options = {'REGISTER', 'UNDO'} 
     
@@ -396,17 +409,17 @@ class OBJECT_OT_Unmetatrim(bpy.types.Operator):  #Operator paste source in/out
         # here starts the operator...
         
         #get all META from selected strips
-        strips=[]
+        metastrips=[]
         for i in context.selected_editable_sequences:
             if i.type == "META":
-                strips.append(i) 
+                metastrips.append(i) 
         
-        for meta in strips:
-            # deselect all strips 
-            for i in strips:
-                i.select = False
+        for meta in metastrips:
+            bpy.ops.sequencer.reload()  
 
-            print("### vuelta")
+            # deselect all strips 
+            for i in context.selected_editable_sequences:
+                i.select = False
 
             #make active current meta
             meta.select = True
@@ -416,42 +429,103 @@ class OBJECT_OT_Unmetatrim(bpy.types.Operator):  #Operator paste source in/out
             #set in and out to meta
             sin = meta.frame_start + meta.frame_offset_start
             sout = sin + meta.frame_final_duration
-            print("meta: ", sin, sout)
+            #print("meta: ", sin, sout)
 
             #grab meta content
             newstrips = []
             for i in meta.sequences:
                 newstrips.append(i)
-            
-            #separate meta
-            bpy.ops.sequencer.meta_separate()
-            bpy.ops.sequencer.reload()
-            #
+
+            #store meta channel
+            basechan = meta.channel
+            #look for upper and lower channels used by strips inside the meta
+            lowerchan = 32
+            upperchan = 0
+            for i in newstrips:
+                if i.channel < lowerchan: lowerchan = i.channel
+                if i.channel > upperchan: upperchan = i.channel
+            #calculate channel increment needed
+            deltachan =  basechan - lowerchan  
+            # reorder strips inside the meta
+            # before separate we need to store channel data
+            delta = upperchan - lowerchan + 1
+            for i in newstrips:
+                i.channel = i.channel + delta
+            chandict = {}
+            for i in newstrips:
+                i.channel = i.channel + deltachan - delta
+                chandict[i.name]=i.channel
+            #for i in chandict: print(i,chandict[i])
+
+            #go inside meta to trim strips
+            bpy.ops.sequencer.meta_toggle()
+
+            #update seq definition according to meta
+            meta_level = len(seq.meta_stack)
+            if meta_level > 0:
+                seq = seq.meta_stack[meta_level - 1]
+
+            #create a list to store clips outside selection
+            #that will be removed
             rmlist=[]
+            #deselect all separated strips
             for j in newstrips:
                 j.select = False
+                #print("newstrips: ",j.name, j.type)
+            #trim each strip separately
+            #first check special strips:
+            # (those who can move when any other does)
             for i in newstrips:
-                print(i)
+                if i.type in {"CROSS","SPEED","WIPE"}:
+                    i.select = True
+                    remove = functions.triminout(i,sin,sout)
+                    if remove == True:
+                        #print("checked: ",i.name, i.type)
+                        rmlist.append(i)
+                    i.select=False
+            # now for the rest of strips
+            for i in newstrips:
                 i.select = True
                 remove = functions.triminout(i,sin,sout)
                 if remove == True:
+                    #print("checked: ",i.name, i.type)
                     rmlist.append(i)
                 i.select=False
-        for i in rmlist:
-            seq.sequences.remove(i)        
 
-        bpy.ops.sequencer.reload()
+            # back outside the meta and separate it
+            bpy.ops.sequencer.meta_toggle()
+            bpy.ops.sequencer.meta_separate()
 
-        #restore original IN and OUT values
-        if borrarin:
-            markers.remove(markers['IN'])
-        else:
-            markers["IN"].frame = original_in
-        if borrarout:
-            markers.remove(markers['OUT'])
-        else:
-            markers["OUT"].frame = original_out
-        scn.update()
+            # reset seq definition
+            seq=scn.sequence_editor
+
+            #remove strips from outside the meta duration
+            for i in rmlist:
+                #print("removing: ",i.name, i.type)
+                for j in scn.sequence_editor.sequences_all: j.select = False
+                i.select = True
+                scn.sequence_editor.active_strip = i
+                bpy.ops.sequencer.delete()
+
+            #select all strips and set one of the strips as active
+            for i in newstrips:
+                if i not in rmlist:
+                    i.select = True
+                    scn.sequence_editor.active_strip = i 
+
+            bpy.ops.sequencer.reload()
+
+            #restore original IN and OUT values
+            if borrarin:
+                markers.remove(markers['IN'])
+            else:
+                markers["IN"].frame = original_in
+            if borrarout:
+                markers.remove(markers['OUT'])
+            else:
+                markers["OUT"].frame = original_out
+            scn.update()
+            
     
 
         return {'FINISHED'}
@@ -515,7 +589,7 @@ class OBJECT_OT_Extrahandles(bpy.types.Operator):  #Operator paste source in/out
             return False
 
     def execute(self, context):
-        scene=bpy.context.scene
+        scn=context.scene
         strips = context.selected_editable_sequences
         
         resetLeft = False
@@ -545,7 +619,6 @@ class OBJECT_OT_Extrahandles(bpy.types.Operator):  #Operator paste source in/out
             if resetLeft:
                 strip.select_left_handle = False
             if self.side == 0 or self.side == 1:
-                print("uno", self.side, resetLeft, resetRight)
                 if strip.select_left_handle:
                     strip.select_left_handle = False
                 else:
@@ -553,13 +626,16 @@ class OBJECT_OT_Extrahandles(bpy.types.Operator):  #Operator paste source in/out
             if resetRight:
                 strip.select_right_handle = False
             if self.side == 1 or self.side == 2:
-                print("otro", self.side, resetLeft, resetRight)
                 if strip.select_right_handle:
                     strip.select_right_handle = False
                 else:
                     strip.select_right_handle = True
                
         return {'FINISHED'}
+
+
+
+
 
 #-----------------------------------------------------------------------------------------------------
 
@@ -579,7 +655,7 @@ class Jumptocut(bpy.types.Panel):
     def poll(self, context):
         strip = functions.act_strip(context)
         scn = context.scene
-        preferences = bpy.context.user_preferences
+        preferences = context.user_preferences
         prefs = preferences.addons['sequencer_extra_actions'].preferences
         if scn and scn.sequence_editor:
             if prefs.use_jumptocut:
@@ -592,11 +668,11 @@ class Jumptocut(bpy.types.Panel):
         layout.label(text="", icon="IPO_BOUNCE")
 
     def draw(self, context):
-        
-        preferences = bpy.context.user_preferences
-        prefs = preferences.addons['sequencer_extra_actions'].preferences
-        
+        scn = context.scene
 
+        #preferences = context.user_preferences
+        #prefs = preferences.addons['sequencer_extra_actions'].preferences
+        
         layout = self.layout
 
         row=layout.row(align=True)
@@ -611,51 +687,107 @@ class Jumptocut(bpy.types.Panel):
         row2.operator("screen.marker_jump", icon='TRIA_RIGHT', text="marker").next=True
 
         row=layout.row(align=True)
-        split=row.split()
+        row.label("In/Out tools:")
+
+        row=layout.row(align=True)
+        split=row.split(percentage=0.7)
         colR1 = split.column()
         row1=colR1.row(align=True)
         row1.operator("sequencerextra.sourcein", icon="MARKER_HLT", text="set IN")
         row1.operator("sequencerextra.sourceout", icon='MARKER_HLT', text="set OUT")
-        colR2 = split.column()
-        split=colR2.split(percentage=0.5)
         colR3 = split.column()
-        colR4 = split.column()
         colR3.operator("sequencerextra.setinout", icon="ARROW_LEFTRIGHT", text="selected")
-        colR4.operator("sequencerextra.triminout", icon="FULLSCREEN_EXIT", text="trim")
         
-        row=layout.row(align=True)
-        split=row.split(percentage=0.5)
+        row_markers=layout.row(align=True)
+        split=row_markers.split(percentage=0.7)
         colR1 = split.column()
-        sin=100
-        sout=200
         row1=colR1.row(align=True)
-        #row1.prop(prefs, "in_marker")
-        #row1.prop(prefs, "out_marker")
+        if scn.auto_markers == False:
+            row1.prop(scn, "auto_markers", text="auto markers")
+        else:
+            row1.prop(scn, "auto_markers", text="")
+            row1.prop(scn, "in_marker")
+            row1.prop(scn, "out_marker")
+            row1.active = scn.auto_markers
+        colR3 = split.column()
+        colR3.operator("sequencerextra.triminout", icon="FULLSCREEN_EXIT", text="trim",emboss=True)
 
-        colR2 = split.column()
-        row1=colR2.row(align=True)
-        row1.operator("sequencerextra.metacopy", icon="COPYDOWN", text="meta")
-        row1.operator("sequencerextra.metapaste", icon='PASTEDOWN', text="& snap")
-
-        row=layout.row(align=True)
-        split=row.split(percentage=0.5)
-        colR1 = split.column()
-        colR1.operator('sequencerextra.navigateup', icon='FILE_PARENT')
-        colR2 = split.column()
-        colR2.operator('sequencerextra.meta_separate_trim', text='unMeta & Trim', icon='ALIGN')
         
 
+        row=layout.row()
+        row.label("Meta tools:")
+
+        row=layout.row(align=True)
+        split=row.split(percentage=0.99)
+        colR1 = split.column()
+        colR1.operator('sequencerextra.navigateup', icon='FILE_PARENT', text="Up")
+        
+        split = row.split(percentage=0.99)
+        colR2 = split.column()
+        row1 = colR2.row(align=True)
+        row1.operator("sequencerextra.metacopy", icon="COPYDOWN", text="meta-copy")
+        row1.operator("sequencerextra.metapaste", icon='PASTEDOWN', text="paste-snap")
+        
+        split = row.split(percentage=0.99)
+        colR3 = split.column()
+        colR3.operator('sequencerextra.meta_separate_trim', text='unMeta & Trim', icon='ALIGN')
+        
+        row=layout.row(align=True)
+        row.label("Adjust Start and End to:")
         row=layout.row(align=True)
         row.operator("sequencerextra.setstartend", icon="PREVIEW_RANGE", text="IN/OUT")
         row.operator('timeextra.trimtimelinetoselection', text='Selection', icon='PREVIEW_RANGE')
-        row.operator('timeextra.trimtimeline', text='Content', icon='PREVIEW_RANGE')
+        row.operator('timeextra.trimtimeline', text='All', icon='PREVIEW_RANGE')
 
         row=layout.row(align=True)
+        row.label("Snap to:")    
+        #row=layout.row(align=True)
         row.operator('sequencerextra.extrasnap', text='left', icon='SNAP_ON').align=0
         row.operator('sequencerextra.extrasnap', text='center', icon='SNAP_ON').align=1
         row.operator('sequencerextra.extrasnap', text='right', icon='SNAP_ON').align=2
 
         row=layout.row(align=True)
-        row.operator('sequencerextra.extrahandles', text='left H', icon='TRIA_LEFT').side=0
-        row.operator('sequencerextra.extrahandles', text='both H', icon='PMARKER').side=1
-        row.operator('sequencerextra.extrahandles', text='right H', icon='TRIA_RIGHT').side=2
+        row.label("Select handlers:")
+        #row=layout.row(align=True)
+        row.operator('sequencerextra.extrahandles', text='left', icon='TRIA_LEFT').side=0
+        row.operator('sequencerextra.extrahandles', text='both', icon='PMARKER').side=1
+        row.operator('sequencerextra.extrahandles', text='right', icon='TRIA_RIGHT').side=2
+
+        
+
+@persistent
+def marker_handler(scn):
+    context=bpy.context
+    functions.initSceneProperties(context)
+    #preferences = context.user_preferences
+    #prefs = preferences.addons['sequencer_extra_actions'].preferences 
+    if scn.auto_markers:
+        #scn = context.scene
+        
+        markers =scn.timeline_markers
+        
+        if "IN" in markers:
+            mark=markers["IN"]
+            mark.frame=scn.in_marker
+        else:
+            mark=markers.new(name="IN")
+            mark.frame=scn.in_marker           
+
+        if "OUT" in markers:
+            mark=markers["OUT"]
+            mark.frame=scn.out_marker
+        else:
+            mark= markers.new(name="OUT")
+            mark.frame=scn.out_marker
+
+        #limit OUT marker position with IN marker
+        if scn.in_marker > scn.out_marker:
+            scn.out_marker = scn.in_marker
+
+        return {'FINISHED'}      
+    else:
+        return {'CANCELLED'}
+
+bpy.app.handlers.scene_update_post.append(marker_handler)
+
+

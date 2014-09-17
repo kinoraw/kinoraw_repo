@@ -68,15 +68,38 @@ movieextdict = [("1", ".avi", ""),
 
 # Functions
 
-# initSceneProperties has to be removed as scene properties and 
-# recoded in __init__ as addon properties.
+# initSceneProperties is ONLY for varaibles that should 
+# be keeped with the blend file. Any other addon preferences
+# should go to the addon preferences operator in __init__
 # TODO: recode operator_exta_actions.py
-def initSceneProperties(context, scn):
+def initSceneProperties(context):
     try:
         if context.scene.scene_initialized == True:
             return False
     except AttributeError:
         pass
+
+    scn = context.scene
+
+    bpy.types.Scene.auto_markers = BoolProperty(
+        name='auto_markers',
+        description='activate auto markers',
+        default=True)
+    scn.auto_markers = True
+
+    bpy.types.Scene.in_marker = IntProperty(
+        name='in',
+        description='in frame position',
+        min=-30000, max=30000,
+        default=0)
+    scn.in_marker = 0
+
+    bpy.types.Scene.out_marker = IntProperty(
+        name='out',
+        description='out frame position',
+        min=scn.in_marker, max=30000,
+        default=250)
+    scn.out_marker = 250
 
     bpy.types.Scene.default_slide_offset = IntProperty(
         name='Offset',
@@ -374,6 +397,9 @@ def recursive(context, recursive_select_by_extension, ext):
 
 # jump to cut functions
 def triminout(strip, sin, sout):
+
+    """trim the strip to in and out, and returns 
+    true if the strip is outside given in and out"""
     
     start = strip.frame_start + strip.frame_offset_start - strip.frame_still_start
     end = start + strip.frame_final_duration
@@ -481,7 +507,7 @@ def randompartition(lst,n,rand):
     count = 0
     newlist=[]
     for i in range(n):
-        print(lst[count : int(lista[i]-1)+count])
+        #print(lst[count : int(lista[i]-1)+count])
         newlist.append([lst[count : int(lista[i]-1)+count]])
         count += int(lista[i]) 
     return newlist

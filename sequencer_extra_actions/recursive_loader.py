@@ -110,7 +110,7 @@ class Sequencer_Extra_RecursiveLoader(bpy.types.Operator):
             self.recursive_proxies = scn.default_recursive_proxies
             self.ext = scn.default_ext 
         except AttributeError:
-            functions.initSceneProperties(context, scn)
+            functions.initSceneProperties(context)
             self.build_25 = scn.default_build_25
             self.build_50 = scn.default_build_50
             self.build_75 = scn.default_build_75
@@ -151,7 +151,7 @@ class Sequencer_Extra_RecursiveLoader(bpy.types.Operator):
 
     def execute(self, context):
         scn = context.scene
-        #functions.initSceneProperties(context, scn)
+        #functions.initSceneProperties(context)
         if self.recursive == True:
             #recursive
             #print(functions.sortlist(functions.recursive(\
@@ -178,7 +178,7 @@ class Sequencer_Extra_RecursiveLoader(bpy.types.Operator):
             scn.default_recursive_proxies = self.recursive_proxies
             scn.default_ext = self.ext 
         except AttributeError:
-            functions.initSceneProperties(context, scn)
+            functions.initSceneProperties(context)
             self.build_25 = scn.default_build_25
             self.build_50 = scn.default_build_50
             self.build_75 = scn.default_build_75
@@ -276,7 +276,7 @@ class ExifInfoPanel(bpy.types.Panel):
     def poll(self, context):
         strip = functions.act_strip(context)
         scn = context.scene
-        preferences = bpy.context.user_preferences
+        preferences = context.user_preferences
         prefs = preferences.addons['sequencer_extra_actions'].preferences
         
         if scn and scn.sequence_editor and scn.sequence_editor.active_strip:

@@ -79,7 +79,7 @@ class ExtractWavOperator(bpy.types.Operator):
 
     def execute(self, context):
 
-        preferences = bpy.context.user_preferences
+        preferences = context.user_preferences
         audio_dir = preferences.addons['sequencer_extra_actions'].preferences.audio_dir
 
         functions.create_folder(bpy.path.abspath(audio_dir))
@@ -162,7 +162,7 @@ class ExternalAudioSetSyncOperator(bpy.types.Operator):
 
     def execute(self, context):
 
-        preferences = bpy.context.user_preferences
+        preferences = context.user_preferences
         filename = preferences.addons['sequencer_extra_actions'].preferences.audio_external_filename
 
         for strip in context.selected_editable_sequences:
@@ -218,7 +218,7 @@ class ExternalAudioReloadOperator(bpy.types.Operator):
 
     def execute(self, context):
 
-        preferences = bpy.context.user_preferences
+        preferences = context.user_preferences
         filename = preferences.addons['sequencer_extra_actions'].preferences.audio_external_filename
 
         data = readsyncfile(filename)
@@ -283,7 +283,7 @@ class CreateAudioToolPanel(bpy.types.Panel):
     def poll(self, context):
         strip = functions.act_strip(context)
         scn = context.scene
-        preferences = bpy.context.user_preferences
+        preferences = context.user_preferences
         prefs = preferences.addons['sequencer_extra_actions'].preferences
         if scn and scn.sequence_editor and scn.sequence_editor.active_strip:
             if prefs.use_audio_tools:
@@ -297,7 +297,7 @@ class CreateAudioToolPanel(bpy.types.Panel):
 
     def draw(self, context):
 
-        preferences = bpy.context.user_preferences
+        preferences = context.user_preferences
         prefs = preferences.addons['sequencer_extra_actions'].preferences
 
         layout = self.layout

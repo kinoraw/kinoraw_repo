@@ -17,9 +17,9 @@
 # ##### END GPL LICENSE BLOCK #####
 
 bl_info = {
-    "name": "Extra Sequencer Actions",
+    "name": "Extra Sequencer Actions - Kinoraw development version",
     "author": "Turi Scandurra, Carlos Padial",
-    "version": (3, 11),
+    "version": (3, 12),
     "blender": (2, 71, 0),
     "category": "Sequencer",
     "location": "Sequencer",
@@ -61,16 +61,6 @@ from bpy.props import IntProperty, StringProperty, BoolProperty
 class ExtraActionsAddon(bpy.types.AddonPreferences):
     bl_idname = "sequencer_extra_actions"
     bl_option = {'REGISTER'}
-
-    in_marker = IntProperty(
-        name = 'in',
-        default = 0,
-        min = -300000, max = 300000)
-
-    out_marker = IntProperty(
-        name = 'out',
-        default = 0,
-        min = -300000, max = 300000)
 
     use_exif_panel = BoolProperty(
     name='enable exif info panel',
@@ -191,10 +181,6 @@ class ExtraActionsAddon(bpy.types.AddonPreferences):
         # AUDIO
         layout = self.layout
         layout.prop(self, "use_audio_tools")
-        
-
-
-
 
 
 # Registration
@@ -232,6 +218,12 @@ def register():
     'W', 'PRESS', ctrl=False, shift=False)
     kmi.properties.next = True
 
+     # in and out
+    kmi = km.keymap_items.new("sequencerextra.sourcein",
+    'I', 'PRESS', ctrl=False, shift=False)
+    kmi = km.keymap_items.new("sequencerextra.sourceout",
+    'O', 'PRESS', ctrl=False, shift=False)
+
     #markers
     kc = bpy.context.window_manager.keyconfigs.active
     km = kc.keymaps.new(name='Screen')
@@ -241,6 +233,9 @@ def register():
     kmi = km.keymap_items.new("screen.marker_jump",
     'W', 'PRESS', ctrl=False, shift=True)
     kmi.properties.next=True
+
+   
+
     
 
 
@@ -266,6 +261,11 @@ def unregister():
     
     km.keymap_items.remove(km.keymap_items['sequencerextra.jumptocut'])
     km.keymap_items.remove(km.keymap_items['sequencerextra.jumptocut'])
+
+
+    km.keymap_items.remove(km.keymap_items['sequencerextra.sourcein'])
+    km.keymap_items.remove(km.keymap_items['sequencerextra.sourceout'])
+
 
     kc = bpy.context.window_manager.keyconfigs.active
     km = kc.keymaps['Screen']

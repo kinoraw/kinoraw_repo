@@ -25,7 +25,7 @@ def create_proxy(strip, size, res):
     div = 4/size
     newres = (int(int(res[0])/div), int(int(res[1])/div))
 
-    preferences = bpy.context.user_preferences
+    preferences = context.user_preferences
     proxy_dir = preferences.addons['sequencer_extra_actions'].preferences.proxy_dir
     scripts = preferences.addons['sequencer_extra_actions'].preferences.proxy_scripts
 
@@ -113,7 +113,7 @@ class CreateProxyOperator(bpy.types.Operator):
 
     def execute(self, context):
 
-        preferences = bpy.context.user_preferences
+        preferences = context.user_preferences
         proxy_dir = preferences.addons['sequencer_extra_actions'].preferences.proxy_dir
         scripts = preferences.addons['sequencer_extra_actions'].preferences.proxy_scripts
         proxy_scripts_path = preferences.addons['sequencer_extra_actions'].preferences.proxy_scripts_path
@@ -165,7 +165,7 @@ class CreateProxyToolPanel(bpy.types.Panel):
     def poll(self, context):
         strip = functions.act_strip(context)
         scn = context.scene
-        preferences = bpy.context.user_preferences
+        preferences = context.user_preferences
         prefs = preferences.addons['sequencer_extra_actions'].preferences
         if scn and scn.sequence_editor and scn.sequence_editor.active_strip:
             if prefs.use_proxy_tools:
@@ -179,7 +179,7 @@ class CreateProxyToolPanel(bpy.types.Panel):
 
     def draw(self, context):
 
-        preferences = bpy.context.user_preferences
+        preferences = context.user_preferences
         prefs = preferences.addons['sequencer_extra_actions'].preferences
 
         layout = self.layout

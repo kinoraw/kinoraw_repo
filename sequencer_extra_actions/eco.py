@@ -43,7 +43,7 @@ class EcoPanel(bpy.types.Panel):
     def poll(self, context):
         strip = functions.act_strip(context)
         scn = context.scene
-        preferences = bpy.context.user_preferences
+        preferences = context.user_preferences
         prefs = preferences.addons['sequencer_extra_actions'].preferences
         if scn and scn.sequence_editor and scn.sequence_editor.active_strip:
             if prefs.use_eco_tools:
@@ -60,7 +60,7 @@ class EcoPanel(bpy.types.Panel):
         strip = functions.act_strip(context)
         seq_type = strip.type
 
-        preferences = bpy.context.user_preferences
+        preferences = context.user_preferences
         prefs = preferences.addons['sequencer_extra_actions'].preferences
         
         if seq_type in ( 'MOVIE', 'IMAGE', 'META', 'MOVIECLIP', 'SCENE') :
@@ -103,7 +103,7 @@ class OBJECT_OT_EcoOperator(bpy.types.Operator):
         
         active_strip=functions.act_strip(context)
         
-        preferences = bpy.context.user_preferences
+        preferences = context.user_preferences
         prefs = preferences.addons['sequencer_extra_actions'].preferences
         
         scn = bpy.context.scene

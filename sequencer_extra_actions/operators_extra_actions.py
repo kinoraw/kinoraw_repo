@@ -37,12 +37,6 @@ from bpy.props import StringProperty
 from . import functions
 from . import exiftool
 
-
-# Initialization
-
-
-
-
    
 # TRIM TIMELINE
 class Sequencer_Extra_TrimTimeline(bpy.types.Operator):
@@ -186,7 +180,7 @@ class Sequencer_Extra_SlideStrip(bpy.types.Operator):
 
     def invoke(self, context, event):
         scn = context.scene
-        functions.initSceneProperties(context,scn)
+        functions.initSceneProperties(context)
         self.slide_offset = scn.default_slide_offset
         if self.mode == 'INPUT':
             return context.window_manager.invoke_props_dialog(self)
@@ -1070,7 +1064,7 @@ class Sequencer_Extra_FadeInOut(bpy.types.Operator):
 
     def invoke(self, context, event):
         scn = context.scene
-        functions.initSceneProperties(context, scn)
+        functions.initSceneProperties(context)
         self.fade_duration = scn.default_fade_duration
         self.fade_amount = scn.default_fade_amount
         return context.window_manager.invoke_props_dialog(self)
@@ -1171,7 +1165,7 @@ class Sequencer_Extra_Distribute(bpy.types.Operator):
 
     def invoke(self, context, event):
         scn = context.scene
-        functions.initSceneProperties(context, scn)
+        functions.initSceneProperties(context)
         self.distribute_offset = scn.default_distribute_offset
         self.distribute_reverse = scn.default_distribute_reverse
         return context.window_manager.invoke_props_dialog(self)
@@ -1372,7 +1366,7 @@ class Sequencer_Extra_PlaceFromFileBrowserProxy(bpy.types.Operator):
 
     def invoke(self, context, event):
         scn = context.scene
-        functions.initSceneProperties(context, scn)
+        functions.initSceneProperties(context)
         self.build_25 = scn.default_build_25
         self.build_50 = scn.default_build_50
         self.build_75 = scn.default_build_75
