@@ -1,58 +1,60 @@
-addons_kinoraw (para blender 2.70)
+addons_kinoraw (blender 2.71)
 ===================================
 
-cada addon o script puede tener unas instrucciones diferentes de instalacion y uso:
 
 
 sequencer_extra_actions
 -----------------------
 
-1.- comprimir la carpeta sequencer_extra_actions en un zip
+1.- ZIP the sequencer_extra_actions folder
 
-2.- abrir la ventana de preferencias del usuario, en la pestana de addons, abajo de la ventana hay un boton que dice 'install from file'. Seleccionar el zip y cargarlo.
+2.- open the user preferences window (ctrl+alt+u) and load the zip file with the button 'install from file' you can find at the bottom of the window.
 
-3.- en la ventana de addons hay que activar el cuadradito que aparece a la derecha.
+3.- now in the addons window, you should activate the addon by presing the checkbox next to the addon 
 
-El script incluye diversas utilidades, para la mayoria consultar:
+
+There are some spreaded documentation. Main functions are described here:
 
 http://wiki.blender.org/index.php/Extensions:2.6/Py/Scripts/Sequencer/Extra_Sequencer_Actions
 
-para audio y proxy tools consultar (por el momento es la explicacion de la versión antigua):
+for audio and proxy tools check this old explanation:
 
 http://kinoraw.net/wordpress/herramientas-para-la-produccion-de-cine-libre/addons-para-blender/proxy-and-audio-tools/extractimport-wav/
 
 http://kinoraw.net/wordpress/herramientas-para-la-produccion-de-cine-libre/addons-para-blender/proxy-and-audio-tools/createset-proxy/
 
-para jump to cut consultar:
+for jump to cut check this, but many things changed since this docs...
 
 http://wiki.blender.org/index.php/Extensions:2.6/Py/Scripts/Sequencer/Jump_to_cut
 
-para eco tools consultar:
+for eco tools check:
 
 http://wiki.blender.org/index.php/Extensions:2.6/Py/Scripts/Sequencer/Eco
 
-para que funcione exif info panel hay que instalar exiftools:
+to get exif info panel you need to install exiftools:
 
     sudo apt-get install libimage-exiftool-perl
+
+it is suposed to work fine with windows and mac. Some feedback with steps to acomplish this will be apreciated.
 
 mega_render_operator.py
 -------------------------------
 
-El operador "generate" divide el timeline en n trozos, siendo n el numero de nucleos disponibles, y genera un script en bash para lanzar tantos blenders como nucleos se le indiquen, ejecutando procesos de blender en background.
+"Generate" operator divides the timeline in n pieces, being n the number of available cpu kernels, and generate a bash script to launch as many background blenders as cpu threads.
 
 
 stop_motion / elphel_panel
 ------------------------
 
-hay que instalar varios programas para usar este addon...
+you need to install some programs to use this addon...
 
-para la webcam hay que instalar:
+for webcam you need:
 
     gstreamer-0.10
     guvcview
     mencoder
 
-para la elphel tambien hace falta
+for elphel version you also need:
 
     exiftools
 
