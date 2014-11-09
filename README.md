@@ -31,6 +31,7 @@ You can clone the addon directly in the blender addons folder, i.e: in my ubuntu
 computer i had to do:
 
 cd ~/.config/blender/2.72/scripts/addons
+
 git clone https://github.com/kinoraw/kinoraw_tools
 
 then you can start blender and activate the addon in the user preferences
