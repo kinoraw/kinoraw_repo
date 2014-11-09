@@ -15,7 +15,7 @@ Kinoraw Tools addon
 
 sequencer_extra_actions now is part of kinoraw tools addon.
 
-I removed the buttons in the VSE header, also create a panel to host all working functions. All menu entries are in the original place in the UI. 
+I removed the buttons in the VSE header, also create a panel to host all working functions. All menu entries are in the original place in the UI. Distribute, ripples and inserts doesn't work, needs some slow check...
 
 I removed many old proxy functions in the recursive loader and extra operators. The proxy tool module is better and easier to use...
 
