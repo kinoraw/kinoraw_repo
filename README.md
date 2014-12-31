@@ -15,15 +15,19 @@ Kinoraw Tools addon
 
 sequencer_extra_actions now is part of kinoraw tools addon.
 
-I removed the buttons in the VSE header, also create a panel to host all working functions. All menu entries are in the original place in the UI. Distribute, ripples and inserts doesn't work, needs some slow check...
+I removed the buttons in the VSE header, also create a panel to host all working functions. All menu entries are in the original place in the UI. Distribute, ripples and inserts doesn't work, needs some check...
 
 I removed many old proxy functions in the recursive loader and extra operators. The proxy tool module is better and easier to use...
 
 Every panel can be switched visible/invisible in the addon preferences panel.
 
+in blender 2.73 there is an option to jump to edit points, so jump to cut original feature, and also a slide function like the one in sequencer extra tools (Turi Scandurra) so both have been merged into blender code!!! =) 
 
-kinoraw tools will be developed in a separate repository
------------------------
+Todo: keep the buttons in the panel but remove old operator to launch the internal feature
+
+Todo: remove slide operator and change the shortcut to internal feature
+
+(((((kinoraw tools will be developed in a separate repository)))))
 
 The development version of the addon is here: https://github.com/kinoraw/kinoraw_tools
 
@@ -75,7 +79,11 @@ to get exif info panel you need to install exiftools:
 mega_render_operator.py
 -------------------------------
 
-"Generate" operator divides the timeline in n pieces, being n the number of available cpu kernels, and generate a bash script to launch as many background blenders as cpu threads.
+Important: you should put a correct path to run your current blender version in the addon preferences menu.
+
+it is mainly bash stuff, only tested in linux yet.
+
+"Generate" operator divides the timeline in n pieces, being n the number of available cpu kernels, and create a bash script to launch as many background blenders as cpu threads.
 
 
 stop_motion / elphel_panel
