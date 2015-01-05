@@ -19,7 +19,7 @@
 bl_info = {
     "name": "Mega Render",
     "author": "Carlos Padial, Ferhoyo",
-    "version": (0, 11),
+    "version": (0, 12),
     "blender": (2, 73, 0),
     "category": "Sequencer",
     "location": "Sequencer",
@@ -186,7 +186,7 @@ class MegaRenderAddon(bpy.types.AddonPreferences):
     blenderpath = StringProperty(
         name="blender executable path",
         description="blender executable path",
-        default="~/soft/blender-2.71-linux-glibc211-x86_64/blender")
+        default=bpy.app.binary_path)
 
     scriptfilename = StringProperty(
         name="script filename",
