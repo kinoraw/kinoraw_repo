@@ -163,6 +163,10 @@ class MegaRenderPanel(bpy.types.Panel):
     def poll(self, context):
         return context.scene.sequence_editor
 
+    def draw_header(self, context):
+        layout = self.layout
+        layout.label(text="", icon="FORCE_WIND")
+
     def draw(self, context):
 
         preferences = context.user_preferences
