@@ -74,16 +74,17 @@ to get exif info panel you need to install exiftools:
 
 
 
-
-
 mega_render_operator.py
 -------------------------------
 
-Important: you should put a correct path to run your current blender version in the addon preferences menu.
+it is mainly bash stuff, only tested in linux yet. It uses zenity to show info...
 
-it is mainly bash stuff, only tested in linux yet.
+'Generate' operator divides the timeline in n pieces, being n the number of available cpu kernels, and create a bash script to launch as many background blenders as cpu threads. 
 
-"Generate" operator divides the timeline in n pieces, being n the number of available cpu kernels, and create a bash script to launch as many background blenders as cpu threads.
+Be sure to save your project and setup your output location before press 'launch render'
+
+
+
 
 
 stop_motion / elphel_panel
