@@ -1,12 +1,9 @@
-addons_kinoraw (blender 2.72)
+addons_kinoraw (blender 2.73)
 ===================================
-
-kinoraw_tools
-=============
 
 a compilation of addons to improve video editing with blender's VSE
 
-(Tested with blender 2.72)
+(Tested with blender 2.73)
 
 
 
