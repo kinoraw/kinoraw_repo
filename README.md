@@ -39,4 +39,6 @@ for elphel version you also need:
 
 ## External Addons
 
-### Transform Tools
+### VSE Transform Tool
+
+Mod version working in 2.74  (source: somewhere in Blenderartist...)
