@@ -13,23 +13,6 @@ https://github.com/kinoraw/kinoraw_tools/blob/master/README.md
 * The development version of the addon is: 
 https://github.com/kinoraw/kinoraw_tools
 
-You can clone the addon directly in the blender addons folder, i.e: in my ubuntu
-computer i had to do:
-
-cd ~/.config/blender/2.74/scripts/addons
-
-git clone https://github.com/kinoraw/kinoraw_tools
-
-then you can start blender and activate the addon in the user preferences
-window.
-
-* zip versions in this repo should be latest stable version, ready to install.
-
-
-1.- open the user preferences window (ctrl+alt+u) and load the zip file with the button 'install from file' you can find at the bottom of the window.
-
-2.- after that, you should activate the addon by presing the checkbox next to the addon 
-
 
 ## Mega_render_operator.py
 
@@ -53,3 +36,7 @@ for elphel version you also need:
 
     exiftools
 
+
+## External Addons
+
+### Transform Tools
