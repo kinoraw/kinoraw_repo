@@ -37,8 +37,8 @@ for elphel version you also need:
     exiftools
 
 
-## External Addons
+# External Addons
 
-### VSE Transform Tool
+## VSE Transform Tool
 
 Mod version working in 2.74  (source: somewhere in Blenderartist...)
