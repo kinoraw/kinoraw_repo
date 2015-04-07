@@ -5,6 +5,9 @@ a compilation of addons to improve video editing with blender's VSE
 
 ##Kinoraw Tools addon
 
+Follow this instructions:
+http://wiki.blender.org/index.php/Doc:2.6/Manual/Extensions/Python/Add-Ons#Installation_of_an_Add-On
+
 (Tested with blender 2.74)
 
 * Instructions here:
