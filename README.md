@@ -5,12 +5,17 @@ a compilation of addons to improve video editing with blender's VSE
 
 ##Kinoraw Tools addon
 
-Follow this instructions:
-http://wiki.blender.org/index.php/Doc:2.6/Manual/Extensions/Python/Add-Ons#Installation_of_an_Add-On
+* Download the zip file from this page https://github.com/kinoraw/kinoraw_repo
+
+* Open Blender
+
+* Open the user preferences window (ctrl+alt+u) and load the zip file named *kinoraw_tools_Vxxx.zip* with the button 'install from file' you can find at the bottom of the window.
+
+* After that, you should activate the addon by presing the checkbox next to the addon
 
 (Tested with blender 2.74)
 
-* Instructions here:
+* Documentation here:
 https://github.com/kinoraw/kinoraw_tools/blob/master/README.md
 
 * The development version of the addon is: 
