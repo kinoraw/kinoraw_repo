@@ -7,7 +7,7 @@ a compilation of addons to improve video editing with blender's VSE
 
 * Download the zip file from this page and extract it somewhere or clone the repository with this command
  
-    git clone git@github.com:kinoraw/kinoraw_repo.git
+    git clone https://github.com/kinoraw/kinoraw_repo.git
 
 * Once in Blender, open the user preferences window (ctrl+alt+u) and load the zip file named *kinoraw_tools_Vxxx.zip* with the button 'install from file' you can find at the bottom of the window.
 
