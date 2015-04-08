@@ -52,4 +52,6 @@ for elphel version you also need:
 
 Mod version (source: somewhere in Blenderartist...)
 
-## 
+## VSE Quick Functions
+
+http://blenderartists.org/forum/showthread.php?338598-Addon-WIP-VSE-Quick-functions-Snaps-Fades-Zoom-Parenting-Titling-Play-speed
