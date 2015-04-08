@@ -1,9 +1,10 @@
-#Addons Kinoraw
-
-a compilation of addons to improve video editing with blender's VSE
+# Kinoraw Repository
 
 
-##Kinoraw Tools addon
+A repository of tools to edit video with floss.
+
+
+## Kinoraw Tools (addon for blender 2.74)
 
 * Download the zip file from this page and extract it somewhere or clone the repository with this command
  
@@ -47,6 +48,8 @@ for elphel version you also need:
 
 # External Addons
 
-## VSE Transform Tool
+## VSE Transform Tool  (addon for blender 2.74)
 
-Mod version working in 2.74  (source: somewhere in Blenderartist...)
+Mod version (source: somewhere in Blenderartist...)
+
+## 
