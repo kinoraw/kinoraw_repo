@@ -3,6 +3,8 @@
 
 A repository of tools to edit video with floss.
 
+    In the external section i keep a copy of interesting addons to use in Blender VSE
+
 ##Instructions to install blender addons
 
 * Download the zip file from this page and extract it somewhere or clone the repository with this command
