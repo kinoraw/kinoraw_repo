@@ -134,7 +134,8 @@ bl_info = {
     "blender": (2, 71, 0),
     "location": "Sequencer Panels; Sequencer Menus; Sequencer S, F, Z, Ctrl-P, Shift-P Shortcuts",
     "wiki_url": "none yet",
-    "category": "Sequencer"
+    "category": "Sequencer",
+    "support": "COMMUNITY"
 }
 
 
@@ -686,7 +687,6 @@ class VSEQFContinuous(bpy.types.Operator):
                     sequencer = scene.sequence_editor
                     sequences = bpy.context.sequences
                     clip = sequencer.active_strip
-####################
                     try:                    
                         if (clip.name == self.lastClip):
                             if ((clip.frame_final_start != self.lastClipStart) & (clip.frame_final_duration == self.lastClipLength)):
@@ -763,7 +763,6 @@ class VSEQFContinuous(bpy.types.Operator):
                                             if (soundclip):
                                                 self.report({'INFO'}, "Parenting "+soundclip.name+" to "+clip.name)
                                                 add_children(clip, [soundclip])
-####################
                     except AttributeError:
                         pass
                                         
@@ -784,6 +783,7 @@ class VSEQFContinuous(bpy.types.Operator):
             return {'PASS_THROUGH'}
         else:
             return {'FINISHED'}
+
     def invoke(self, context, event):
         if (context.scene.quickcontinuousenable):
             self.set_old_variables()
@@ -1396,11 +1396,7 @@ class VSEQFQuickZooms(bpy.types.Operator):
 
 def register():
     bpy.utils.register_module(__name__)
-    #add menus
-    bpy.types.SEQUENCER_HT_header.append(draw_quickspeed_header)
-    bpy.types.SEQUENCER_MT_view.append(draw_quickzoom_menu)
-    bpy.types.SEQUENCER_MT_view.prepend(draw_quickcontinuous_menu)
-    bpy.types.SEQUENCER_MT_strip.prepend(draw_quicksnap_menu)
+
     #register properties
     bpy.types.Scene.step = bpy.props.IntProperty(
         name = "Frame Step",
@@ -1489,6 +1485,12 @@ def register():
     bpy.types.Scene.quicklistsort = bpy.props.StringProperty(
         name = "Sort Method",
         default = 'Position')
+    #add menus
+    bpy.types.SEQUENCER_HT_header.append(draw_quickspeed_header)
+    bpy.types.SEQUENCER_MT_view.append(draw_quickzoom_menu)
+    bpy.types.SEQUENCER_MT_view.prepend(draw_quickcontinuous_menu)
+    bpy.types.SEQUENCER_MT_strip.prepend(draw_quicksnap_menu)
+    
     #register shortcuts
     keymap = bpy.context.window_manager.keyconfigs.addon.keymaps.new(name='Sequencer', space_type='SEQUENCE_EDITOR', region_type='WINDOW')
     keymapitems = keymap.keymap_items
