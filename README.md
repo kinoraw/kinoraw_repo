@@ -63,3 +63,9 @@ http://blenderartists.org/forum/showthread.php?280731-VSE-Transform-tool
 ## VSE Quick Functions    (addon for blender 2.74)
 
 http://blenderartists.org/forum/showthread.php?338598-Addon-WIP-VSE-Quick-functions-Snaps-Fades-Zoom-Parenting-Titling-Play-speed
+
+## Copy Modifiers       (addon for blender 2.74)
+
+in the repo there is a modified version with original UI hided  (commented lines)
+
+http://blenderclan.tuxfamily.org/html/modules/newbb/viewtopic.php?post_id=458896#forumpost458896
