@@ -1,4 +1,4 @@
-# Kinoraw Repository
+# Kinoraw Repository (VSE addons for blender 2.76b)
 
 
 A repository of tools to edit video with floss.
@@ -16,9 +16,7 @@ A repository of tools to edit video with floss.
 * After that, you should activate each addon by presing the checkbox next to the addon
 
 
-## Kinoraw Tools (addon for blender 2.74)
-
-(Tested with blender 2.74)
+## Kinoraw Tools
 
 * Documentation here:
 https://github.com/kinoraw/kinoraw_tools/blob/master/README.md
@@ -56,15 +54,15 @@ for elphel version you also need:
 
 # External Addons
 
-## VSE Transform Tool  (addon for blender 2.74)
+## VSE Transform Tool 
 
 http://blenderartists.org/forum/showthread.php?280731-VSE-Transform-tool
 
-## VSE Quick Functions    (addon for blender 2.74)
+## VSE Quick Functions  
 
 http://blenderartists.org/forum/showthread.php?338598-Addon-WIP-VSE-Quick-functions-Snaps-Fades-Zoom-Parenting-Titling-Play-speed
 
-## Copy Modifiers       (addon for blender 2.74)
+## Copy Modifiers    
 
 in the repo there is a modified version with original UI hided  (commented lines)
 
