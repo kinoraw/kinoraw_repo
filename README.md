@@ -1,4 +1,4 @@
-# Kinoraw Repository (VSE addons for blender 2.76b)
+# Kinoraw Repository (VSE addons)
 
 
 A repository of tools to edit video with floss.
@@ -18,6 +18,8 @@ A repository of tools to edit video with floss.
 
 ## Kinoraw Tools
 
+(Blender 2.76b)
+
 * Documentation here:
 https://github.com/kinoraw/kinoraw_tools/blob/master/README.md
 
@@ -27,7 +29,7 @@ https://github.com/kinoraw/kinoraw_tools
 
 ## Mega_render_operator.py
 
-Updated for Blender 2.80
+(Updated for Blender 2.80)
  
 It is mainly bash stuff, only tested in linux yet. It uses zenity to show info...
 
@@ -42,6 +44,8 @@ FFMPEG required.
 
 
 ## Stop_motion / elphel_panel
+
+(Blender 2.76b)
 
 you need to install some programs to use this addon...
 
