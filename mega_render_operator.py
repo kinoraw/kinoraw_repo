@@ -19,11 +19,11 @@
 bl_info = {
     "name": "Mega Render",
     "author": "Carlos Padial, Ferhoyo",
-    "version": (0, 12),
-    "blender": (2, 73, 0),
+    "version": (0, 20),
+    "blender": (2, 80, 0),
     "category": "Sequencer",
     "location": "Sequencer",
-    "description": "mega render operator with log file",
+    "description": "mega render operator for 2.8 with log file",
     "warning": "",
     "wiki_url": "http://kinoraw.net",
     "tracker_url": "http://kinoraw.net",
@@ -31,11 +31,8 @@ bl_info = {
 
 
 
-import bpy, os
+import bpy, os, subprocess
 from bpy.props import IntProperty, StringProperty
-
-import os, subprocess
-
 
 def generate_parts(s_frame, e_frame, number_of_threads):
     #lista de tramos que se han de renderizar
@@ -70,7 +67,7 @@ def generate_scripts():
 
 
 
-class GenerateMegaRenderOperator(bpy.types.Operator):
+class SEQUENCER_PT_GenerateMegaRenderOperator(bpy.types.Operator):
     """ ______________ """
     bl_idname = "sequencer.generatemegarenderoperator"
     bl_label = "generate mega render"
@@ -81,7 +78,7 @@ class GenerateMegaRenderOperator(bpy.types.Operator):
 
     def execute(self, context):
         
-        preferences = context.user_preferences
+        preferences = context.preferences
         prefs = preferences.addons['mega_render_operator'].preferences
 
         blenderpath = prefs.blenderpath
@@ -98,6 +95,14 @@ class GenerateMegaRenderOperator(bpy.types.Operator):
         part = int(duration / number_of_threads)
 
         tramos = generate_parts(s_frame, e_frame, number_of_threads)
+        #Get absolute render path:
+        filepath = bpy.context.scene.render.filepath
+        absolutepath = bpy.path.abspath(filepath)
+        path = os.path.normpath(absolutepath).rsplit('/', 1)[0]
+        #Get render and file format
+        render_format = bpy.data.scenes["Scene"].render.ffmpeg.format
+        file_format = bpy.data.scenes["Scene"].render.image_settings.file_format
+        
 
         #generate_scripts(tra, blenderpath, blendfile, sce, scriptfilename)
 
@@ -108,7 +113,7 @@ class GenerateMegaRenderOperator(bpy.types.Operator):
         text_file = open(bpy.path.abspath(scriptfilename), "w")
         text_file.write("#!/bin/bash\necho \"$(date +'%a %d %b %Y - %H:%M:%S'):\" > {}".format(log_file))
         for i, j in enumerate(tramos):
-            text_file.write(("\n(\necho '#Rendering part {}'\nSTART_RENDER=$(date +'%s')\n").format(i))
+            text_file.write(("\nsleep .1\n(\necho '#Rendering part {}'\nSTART_RENDER=$(date +'%s')\n").format(i))
             text_file.write("RESULT=$({} {} -b -S {} -s {} -e {} -a 2>&1".format(blenderpath, blendfile, sce.name, j[0], j[1]))
             text_file.write(" | grep 'Saved\|Append\|not an anim\|unknown fileformat') \nEND_RENDER=$(date +'%s')\nRENDERING_SECS=$(($END_RENDER-$START_RENDER))\nLINEAS=$(echo \"$RESULT\" | wc -l)\n")
             text_file.write("if [ $LINEAS -eq {} ];then\n".format(j[1]-j[0]+1))
@@ -123,26 +128,45 @@ class GenerateMegaRenderOperator(bpy.types.Operator):
             if i < len(tramos)-1:
                 print(i, len(tramos)-1)
                 text_file.write(" & \n")
+        if file_format == "FFMPEG":
+            if  render_format== "MPEG4":
+                render_extension = "mp4"
+            if render_format =="MKV":
+                render_extension = "mkv"
+                   
+            text_file.write("\nwait \n")
+            text_file.write("cd " + path + "/\n")
+            #Creating a file mylist.txt with all the files to be concatenated
+            text_file.write("for f in *."+render_extension+";do echo \"file \'$f\'\" >> mylist.txt; done \n")
+            text_file.write("sleep .1\n")
+            #FFMPEG Concat demuxer
+            text_file.write("ffmpeg -f concat -safe 0 -i "+path+"/mylist.txt -c copy output."+render_extension+" \n") 
+            text_file.write("wait \n")
+            text_file.write("echo \"Todo hecho\"\n")
+            #Removing temp files 
+            text_file.write("for f in $(grep -o \"'.*'\" "+path+"/mylist.txt | tr -d \"'\"); do rm "+path+"/\"$f\" ; done \n")
+            text_file.write("rm "+path+"/mylist.txt \n")
         text_file.close()
-
+        os.chmod(scriptfilename, 0o744)
+        
         print("script done")        
        
         return {'FINISHED'}
 
 
-class LaunchMegaRenderOperator(bpy.types.Operator):
+class SEQUENCER_PT_LaunchMegaRenderOperator(bpy.types.Operator):
     """ ______________ """
     bl_idname = "sequencer.launchmegarenderoperator"
     bl_label = "launch mega render"
 
     @classmethod
     def poll(self, context):
-        preferences = context.user_preferences
+        preferences = context.preferences
         prefs = preferences.addons['mega_render_operator'].preferences
         return os.path.isfile(bpy.path.abspath(prefs.scriptfilename))
 
     def execute(self, context):
-        preferences = context.user_preferences
+        preferences = context.preferences
         prefs = preferences.addons['mega_render_operator'].preferences
         scriptfilename = bpy.path.abspath(prefs.scriptfilename)
         command = "sh "+scriptfilename
@@ -152,10 +176,10 @@ class LaunchMegaRenderOperator(bpy.types.Operator):
         return {'FINISHED'}
 
 
-class MegaRenderPanel(bpy.types.Panel):
+class SEQUENCER_PT_MegaRenderPanel(bpy.types.Panel):
     """-_-_-"""
     bl_label = "Mega Render VSE"
-    bl_idname = "OBJECT_PTMultiThread"
+    bl_idname = "OBJECT_PT_MultiThread"
     bl_space_type = 'SEQUENCE_EDITOR'
     bl_region_type = 'UI'
     
@@ -166,16 +190,17 @@ class MegaRenderPanel(bpy.types.Panel):
     def draw_header(self, context):
         layout = self.layout
         layout.label(text="", icon="FORCE_WIND")
+        print(context.preferences.addons['mega_render_operator'].preferences.number_of_threads)
 
     def draw(self, context):
 
-        preferences = context.user_preferences
+        preferences = context.preferences
         prefs = preferences.addons['mega_render_operator'].preferences
         number_of_threads = prefs.number_of_threads
 
         layout = self.layout
         row = layout.row(align=True)
-        row.label("______ megarender :)")    
+        row.label(text="______ megarender :)")    
         row.prop(prefs, "number_of_threads", text="threads")
         layout = self.layout
         layout.operator("sequencer.generatemegarenderoperator", text="generate")
@@ -183,21 +208,21 @@ class MegaRenderPanel(bpy.types.Panel):
         
 
 
-class MegaRenderAddon(bpy.types.AddonPreferences):
+class SEQUENCER_PT_MegaRenderAddon(bpy.types.AddonPreferences):
     bl_idname = "mega_render_operator"
     bl_option = {'REGISTER'}
 
-    blenderpath = StringProperty(
+    blenderpath : StringProperty(
         name="blender executable path",
         description="blender executable path",
         default=bpy.app.binary_path)
 
-    scriptfilename = StringProperty(
+    scriptfilename : StringProperty(
         name="script filename",
         description="script filename",
         default="//megarender.sh")
 
-    number_of_threads = IntProperty(
+    number_of_threads : IntProperty(
         name="number of threads",
         description="number of threads",
         default=8,
@@ -208,21 +233,17 @@ class MegaRenderAddon(bpy.types.AddonPreferences):
         layout.prop(self, "blenderpath")
         layout.prop(self, "scriptfilename")
         layout.prop(self, "number_of_threads")
-            
 
-def register():
-    bpy.utils.register_class(MegaRenderAddon)
-    bpy.utils.register_class(LaunchMegaRenderOperator)
-    bpy.utils.register_class(GenerateMegaRenderOperator)
-    bpy.utils.register_class(MegaRenderPanel)
-  
 
-def unregister():
-    bpy.utils.unregister_class(LaunchMegaRenderOperator)
-    bpy.utils.unregister_class(GenerateMegaRenderOperator)
-    bpy.utils.unregister_class(MegaRenderPanel)
-    bpy.utils.unregister_class(MegaRenderAddon)
+classes = (
+    SEQUENCER_PT_MegaRenderAddon,
+    SEQUENCER_PT_LaunchMegaRenderOperator,
+    SEQUENCER_PT_MegaRenderPanel,
+    SEQUENCER_PT_GenerateMegaRenderOperator
+)
 
+register, unregister = bpy.utils.register_classes_factory(classes)  
+         
 
 if __name__ == "__main__":
     register()

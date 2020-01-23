@@ -27,15 +27,19 @@ https://github.com/kinoraw/kinoraw_tools
 
 ## Mega_render_operator.py
 
-it is mainly bash stuff, only tested in linux yet. It uses zenity to show info...
+Updated for Blender 2.80
+ 
+It is mainly bash stuff, only tested in linux yet. It uses zenity to show info...
 
-'Generate' operator divides the timeline in n pieces, being n the number of available cpu kernels, and create a bash script to launch as many background blenders as cpu threads. 
+The operator "generate" divides the timeline in n pieces, being n the number of available cores, and generates a bash script to launch as many blenders as cores are indicated, executing blender processes in background.
 
-    Only works when exporting to frame sequences.
+It works with video and image sequences.
 
-Be sure to save your project and setup your output location before press 'launch render'
+If the output is set to video (at the moment only mp4 and mkv), once the video parts are finished it uses ffmpeg to concatenate them into the final output video file.
 
-in latests versions of blender VSE render uses multithread, so this script is not so necesary, but still it can improve your render times if you need to export to frames.
+
+FFMPEG required.
+
 
 ## Stop_motion / elphel_panel
 
